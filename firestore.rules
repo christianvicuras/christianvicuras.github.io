@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Security rules for the TeamLead page. Paste into Firebase console → Firestore Database → Rules, then Publish.
+// Security rules for the TeamLead page. Deploy with: firebase deploy --only firestore:rules
 //
 // reports/{id}             one document per report; owner = who submitted it, authorEmail = whose report it is
 // reports/{id}/shots/{id}  the screenshots of a report, one per document
@@ -13,8 +13,10 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function email() { return request.auth.token.email.lower(); }
+    // Signed in with a confirmed @vicuras.dk email. Without the confirmation anyone could sign up with someone else's address.
     function isVicuras() {
       return request.auth != null && request.auth.token.email is string
+        && request.auth.token.email_verified == true
         && email().matches('.*@vicuras[.]dk');
     }
     function isAdmin() { return isVicuras() && exists(/databases/$(database)/documents/admins/$(email())); }
