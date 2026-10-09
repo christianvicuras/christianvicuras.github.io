@@ -1,0 +1,2 @@
+# Holds the real list of people with access; the repo is public. See firestore.rules.example.
+firestore.rules

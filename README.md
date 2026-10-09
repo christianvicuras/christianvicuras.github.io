@@ -2,41 +2,40 @@
 
 Bug reports, feedback and ideas from TeamLeads, at `https://christianvicuras.github.io/`.
 
-People create an account with their @vicuras.dk email and a password, and are signed in right away. Each report is stored as its own document in Firestore, tagged with who wrote it, and the security rules in
-[firestore.rules](firestore.rules) decide who sees what:
+People sign in with their @vicuras.dk email and a password. There is no sign-up on the page: accounts are created by
+hand in the Firebase console. Each report is stored as its own document in Firestore, tagged with who wrote it, and the
+security rules decide who sees what:
 
 | Who | Sees | Can do |
 | --- | --- | --- |
 | A TeamLead | Their own reports (also the ones only for Louise) and the shared reports of other TeamLeads | Create reports in their own name |
-| An editor (listed in `admins`) | Every report | Set status, reply, file a report on behalf of a TeamLead |
+| An editor | Every report | Set status, reply, file a report on behalf of a TeamLead |
 
-Emails are **not** confirmed. Anyone who can open the page can create an account with any @vicuras.dk address that
-hasn't been taken yet, including a made-up one, and then read the shared reports. Someone who registers an editor's
-address before the editor does gets editor access, so editors should create their accounts first. To require email
-confirmation again, add `&& request.auth.token.email_verified == true` to `isVicuras()` in the rules.
+Only the emails listed in the rules get in, whatever accounts exist.
 
 ## Firebase project
 
 Project **vicuras-teamlead** (Spark/free plan), console: <https://console.firebase.google.com/project/vicuras-teamlead/overview>
 
 - Firestore database `(default)` in `eur3` (Europe). Screenshots are stored as compressed images in Firestore; Cloud Storage isn't used.
-- Authentication: Email/Password.
+- Authentication: Email/Password. **Authentication → Settings → User actions → "Enable create (sign-up)" must be off**, so nobody can create an account through the API.
 - Web app config is in [firebase-config.js](firebase-config.js) (not secret; access is enforced by the rules).
 
-Change the rules by editing [firestore.rules](firestore.rules) and running, in this folder:
+## Who has access
 
-```
-firebase deploy --only firestore:rules
-```
+The lists of editors and TeamLeads live in `firestore.rules` (functions `editors()` and `teamLeads()`). Because this
+repo and the site are public, that file is **not committed** (see [.gitignore](.gitignore)); it exists on the machine
+that deploys and in Firebase. [firestore.rules.example](firestore.rules.example) is the same file with placeholder
+addresses, to recreate it from.
 
-## Editors
+To add or remove someone:
+1. Edit the list in `firestore.rules` (lowercase emails) and deploy: `firebase deploy --only firestore:rules`
+2. Add or delete the account under **Authentication → Users** in the console.
 
-In **Firestore Database → Data**, the collection `admins` holds one document per editor. The **document ID is the
-editor's email in lowercase** (e.g. `louise@vicuras.dk`); the fields don't matter (e.g. `name: "Louise"`). Editors see
-every report and get the "Status og svar" panel. Delete the document to take the access away.
+If `firestore.rules` is lost, the current rules can be copied from **Firestore Database → Rules** in the console.
 
 ## Notes
-- The email domain is set in two places: `allowedDomain` in [firebase-config.js](firebase-config.js) (what the page checks) and `isVicuras()` in [firestore.rules](firestore.rules) (what the database enforces). Change both if it changes.
-- The password-reset mails come from `noreply@vicuras-teamlead.firebaseapp.com` and can land in spam. Their text can be edited under **Authentication → Templates**.
-- Accounts can be seen, disabled or deleted under **Authentication → Users**.
+- The email domain the page accepts is `allowedDomain` in [firebase-config.js](firebase-config.js).
+- Names on reports come from the email (`anna.hansen@vicuras.dk` → "Anna Hansen").
+- "Glemt adgangskode?" mails come from `noreply@vicuras-teamlead.firebaseapp.com`; Microsoft 365 may quarantine them unless that sender is allowed.
 - To try it locally, serve the folder over http (module scripts don't load from `file://`): `python -m http.server 8000` and open `http://localhost:8000/`.
