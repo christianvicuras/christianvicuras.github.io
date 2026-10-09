@@ -336,7 +336,7 @@ textarea { min-height: 130px; resize: vertical; }
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
+import { getAuth, onAuthStateChanged, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, signOut } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
 import { getFirestore, collection, doc, query, where, onSnapshot, getDoc, getDocs, setDoc, updateDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
 import { firebaseConfig, allowedDomain } from './firebase-config.js';
 
@@ -370,17 +370,14 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       'err-setup': 'Siden er ikke sat op endnu: Firebase-konfigurationen mangler.',
       'err-load': 'Indmeldingerne kunne ikke hentes. Genindlæs siden, eller log ud og ind igen.',
       signout: 'Log ud', 'err-signin': 'Login mislykkedes. Prøv igen.', 'err-domain': 'Brug din @{d}-mail.',
-      'a-in': 'Log ind', 'a-in-sub': 'Log ind med din @{d}-mail for at melde noget ind og følge dine indmeldinger.', 'a-in-go': 'Log ind',
-      'a-up': 'Opret konto', 'a-up-sub': 'Brug din @{d}-mail. Vi sender en mail, så du kan bekræfte, at det er din.', 'a-up-go': 'Opret konto',
-      'a-reset': 'Glemt adgangskode', 'a-reset-sub': 'Skriv din mail, så sender vi et link, hvor du kan vælge en ny adgangskode.', 'a-reset-go': 'Send link',
-      'a-reset-sent': 'Hvis der er en konto med den mail, har vi sendt et link. Tjek også uønsket post.',
-      'a-name': 'Navn', 'a-email': 'Mail', 'a-pass': 'Adgangskode',
-      'a-to-up': 'Ny her? Opret konto', 'a-to-reset': 'Glemt adgangskode?', 'a-to-in': 'Tilbage til log ind',
-      'a-verify': 'Bekræft din mail', 'a-verify-sub': 'Vi har sendt et link til {e}. Klik på linket i mailen, og kom så tilbage hertil. Tjek også uønsket post.',
-      'a-verified': 'Jeg har bekræftet min mail', 'a-resend': 'Send mailen igen', 'a-resent': 'Mailen er sendt igen.',
-      'a-not-yet': 'Mailen er ikke bekræftet endnu. Klik på linket i mailen først.',
-      'a-err-cred': 'Forkert mail eller adgangskode.', 'a-err-exists': 'Der findes allerede en konto med den mail. Log ind i stedet.',
-      'a-err-weak': 'Adgangskoden skal være mindst 8 tegn.', 'a-err-email': 'Skriv en gyldig mailadresse.', 'a-err-name': 'Skriv dit navn.',
+      'a-in': 'Log ind', 'a-in-sub': 'Skriv din @{d}-mail, så sender vi dig et link. Klik på linket i mailen, så er du logget ind. Ingen adgangskode.', 'a-in-go': 'Send mig et link',
+      'a-email': 'Din Vicuras-mail',
+      'a-sent': 'Tjek din mail', 'a-sent-sub': 'Vi har sendt et link til {e}. Åbn mailen, og klik på linket for at logge ind. Den kan være havnet i uønsket post.',
+      'a-resend': 'Send linket igen', 'a-resent': 'Linket er sendt igen.', 'a-other': 'Brug en anden mail',
+      'a-confirm': 'Bekræft din mail', 'a-confirm-sub': 'Du har åbnet linket på en anden enhed eller i en anden browser. Skriv den mail, du fik linket på.', 'a-confirm-go': 'Log ind',
+      'a-new-link': 'Send et nyt link i stedet',
+      'a-err-link': 'Linket er udløbet eller allerede brugt. Få et nyt link herunder.',
+      'a-err-email': 'Skriv en gyldig mailadresse.', 'a-err-off': 'Login med link er ikke slået til endnu. Sig det til Christian.',
       'a-err-many': 'For mange forsøg. Vent lidt, og prøv igen.', 'a-err-net': 'Ingen forbindelse. Tjek dit internet, og prøv igen.',
       mine: 'Mine', others: 'Andre TeamLeads', all: 'Alle', search: 'Søg i indmeldinger',
       'v-grid': 'Kort', 'v-board': 'Tavle', loading: 'Henter indmeldinger …',
@@ -426,17 +423,14 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       'err-setup': 'The page isn’t set up yet: the Firebase configuration is missing.',
       'err-load': 'The reports couldn’t be loaded. Reload the page, or sign out and in again.',
       signout: 'Sign out', 'err-signin': 'Sign-in failed. Please try again.', 'err-domain': 'Use your @{d} email.',
-      'a-in': 'Sign in', 'a-in-sub': 'Sign in with your @{d} email to report something and follow your reports.', 'a-in-go': 'Sign in',
-      'a-up': 'Create account', 'a-up-sub': 'Use your @{d} email. We’ll send you an email to confirm it’s yours.', 'a-up-go': 'Create account',
-      'a-reset': 'Forgot password', 'a-reset-sub': 'Enter your email and we’ll send a link where you can choose a new password.', 'a-reset-go': 'Send link',
-      'a-reset-sent': 'If there’s an account with that email, we’ve sent a link. Check your spam folder too.',
-      'a-name': 'Name', 'a-email': 'Email', 'a-pass': 'Password',
-      'a-to-up': 'New here? Create account', 'a-to-reset': 'Forgot password?', 'a-to-in': 'Back to sign in',
-      'a-verify': 'Confirm your email', 'a-verify-sub': 'We’ve sent a link to {e}. Click the link in the email, then come back here. Check your spam folder too.',
-      'a-verified': 'I’ve confirmed my email', 'a-resend': 'Send the email again', 'a-resent': 'The email has been sent again.',
-      'a-not-yet': 'Your email isn’t confirmed yet. Click the link in the email first.',
-      'a-err-cred': 'Wrong email or password.', 'a-err-exists': 'There’s already an account with that email. Sign in instead.',
-      'a-err-weak': 'The password must be at least 8 characters.', 'a-err-email': 'Enter a valid email address.', 'a-err-name': 'Enter your name.',
+      'a-in': 'Sign in', 'a-in-sub': 'Enter your @{d} email and we’ll send you a link. Click the link in the email and you’re signed in. No password.', 'a-in-go': 'Send me a link',
+      'a-email': 'Your Vicuras email',
+      'a-sent': 'Check your email', 'a-sent-sub': 'We’ve sent a link to {e}. Open the email and click the link to sign in. It may have landed in spam.',
+      'a-resend': 'Send the link again', 'a-resent': 'The link has been sent again.', 'a-other': 'Use another email',
+      'a-confirm': 'Confirm your email', 'a-confirm-sub': 'You opened the link on another device or browser. Enter the email you got the link at.', 'a-confirm-go': 'Sign in',
+      'a-new-link': 'Send a new link instead',
+      'a-err-link': 'The link has expired or was already used. Get a new link below.',
+      'a-err-email': 'Enter a valid email address.', 'a-err-off': 'Sign-in by link isn’t switched on yet. Please tell Christian.',
       'a-err-many': 'Too many attempts. Wait a moment and try again.', 'a-err-net': 'No connection. Check your internet and try again.',
       mine: 'Mine', others: 'Other TeamLeads', all: 'All', search: 'Search reports',
       'v-grid': 'Cards', 'v-board': 'Board', loading: 'Loading reports …',
@@ -472,7 +466,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     lang: store.get('tl-reporter-lang') === 'en' ? 'en' : 'da',
     view: store.get('tl-reporter-view') === 'board' ? 'board' : 'grid',
     type: null, area: null, shots: [], confirmNoShot: false, busy: false,
-    db: null, auth: null, uid: null, admin: false, myEmail: null, myName: '',
+    db: null, auth: null, run: 0, uid: null, admin: false, myEmail: null, myName: '',
     pub: {}, mine: {}, unsub: [],   // report id -> report, from the queries this person may read
     tab: null, drawer: null, notice: null,
     f: { type: '', area: '', status: '', q: '' }
@@ -884,100 +878,103 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
   }
 
   /* ---------- sign-in ---------- */
-  // Email + password, and the email must be confirmed before the page (and firestore.rules) let anyone in.
+  // No passwords: the person types their work email, gets a link, and the link signs them in on this page.
+  const LINK_EMAIL = 'tl-signin-email';
   function showNotice(key) {
     S.notice = { key }; S.authMode = null;
     $('stats').textContent = ''; $('tabs').textContent = ''; $('admin-note').hidden = true;
     const box = $('list'); box.textContent = '';
     const g = el('div', 'grid'); const e = el('div', 'empty'); e.append(el('b', null, t(key))); g.append(e); box.append(g);
   }
-  function input(id, label, type, ac, value) {
-    const f = el('div', 'field'); const l = el('label', 'label', label); l.htmlFor = id;
-    const i = el('input'); i.type = type; i.id = id; i.autocomplete = ac; i.value = value || '';
-    if (type === 'email') { i.inputMode = 'email'; i.placeholder = 'navn@' + allowedDomain; }
-    f.append(l, i); return f;
-  }
   function linkBtn(text, fn) { const b = el('button', 'linkish', text); b.type = 'button'; b.addEventListener('click', fn); return b; }
   function authError(e) {
     const c = (e && e.code) || '';
-    if (c === 'auth/invalid-credential' || c === 'auth/wrong-password' || c === 'auth/user-not-found' || c === 'auth/invalid-login-credentials') return t('a-err-cred');
-    if (c === 'auth/email-already-in-use') return t('a-err-exists');
-    if (c === 'auth/weak-password') return t('a-err-weak');
+    if (c === 'auth/invalid-action-code' || c === 'auth/expired-action-code') return t('a-err-link');
     if (c === 'auth/invalid-email') return t('a-err-email');
-    if (c === 'auth/too-many-requests') return t('a-err-many');
+    if (c === 'auth/operation-not-allowed' || c === 'auth/unauthorized-continue-uri' || c === 'auth/unauthorized-domain') return t('a-err-off');
+    if (c === 'auth/too-many-requests' || c === 'auth/quota-exceeded') return t('a-err-many');
     if (c === 'auth/network-request-failed') return t('a-err-net');
     return t('err-signin');
   }
+  function okDomain(email) { return !allowedDomain || email.endsWith('@' + lc(allowedDomain)); }
+  // "louise.hansen@vicuras.dk" -> "Louise Hansen", so others see a name without anyone filling in a profile.
+  function nameFromEmail(email) {
+    return email.split('@')[0].split(/[._-]+/).filter(Boolean).map(s => s[0].toUpperCase() + s.slice(1)).join(' ');
+  }
+  // mode: 'in' (ask for the email), 'sent' (link is on its way), 'confirm' (link opened on another device: ask the email again)
   function renderAuth(mode, note) {
-    // Keep what was typed when switching mode or language.
-    const keep = id => ($(id) ? $(id).value : '');
-    const vals = { name: keep('a-name'), email: keep('a-email') || (S.auth && S.auth.currentUser && S.auth.currentUser.email) || '' };
+    const typed = $('a-email') ? $('a-email').value : '';
     S.authMode = mode; S.authNote = note || null; S.notice = null;
+    if (mode === 'sent' && note && note.email) S.sentTo = note.email;
     $('stats').textContent = ''; $('tabs').textContent = ''; $('admin-note').hidden = true;
     const box = $('list'); box.textContent = '';
     const card = el('form', 'auth'); card.noValidate = true;
-    const say = n => el('div', 'msg ' + n.kind, n.raw || t(n.key).replace('{e}', vals.email).replace('{d}', allowedDomain));
-    if (mode === 'verify') {
-      card.append(el('h2', null, t('a-verify')), el('p', 'sub', t('a-verify-sub').replace('{e}', vals.email)));
-      if (note) card.append(say(note));
-      const ok = el('button', 'submit', t('a-verified')); ok.type = 'submit';
-      const again = linkBtn(t('a-resend'), async () => {
-        try { await sendEmailVerification(S.auth.currentUser); renderAuth('verify', { kind: 'ok', key: 'a-resent' }); }
-        catch (e) { renderAuth('verify', { kind: 'err', raw: authError(e) }); }
-      });
-      const out = linkBtn(t('signout'), () => signOut(S.auth));
-      const row = el('div', 'auth-links'); row.append(again, out);
-      card.append(ok, row);
-      card.addEventListener('submit', async e => { e.preventDefault(); await checkVerified(true); });
-    } else {
-      const title = { in: 'a-in', up: 'a-up', reset: 'a-reset' }[mode];
-      card.append(el('h2', null, t(title)), el('p', 'sub', t(title + '-sub').replace('{d}', allowedDomain)));
-      if (mode === 'up') card.append(input('a-name', t('a-name'), 'text', 'name', vals.name));
-      card.append(input('a-email', t('a-email'), 'email', 'email', vals.email));
-      if (mode !== 'reset') card.append(input('a-pass', t('a-pass'), 'password', mode === 'up' ? 'new-password' : 'current-password'));
-      const msgBox = el('div'); card.append(msgBox);
-      if (note) msgBox.append(say(note));
-      const go = el('button', 'submit', t(title + '-go')); go.type = 'submit'; card.append(go);
+    const fill = s => s.replace('{d}', allowedDomain).replace('{e}', S.sentTo || '');
+    const msgBox = el('div');
+    const say = n => { msgBox.textContent = ''; if (n && (n.raw || n.key)) msgBox.append(el('div', 'msg ' + n.kind, n.raw || fill(t(n.key)))); };
+    if (mode === 'sent') {
+      card.append(el('h2', null, t('a-sent')), el('p', 'sub', fill(t('a-sent-sub'))), msgBox);
+      say(note && note.kind ? note : null);
       const row = el('div', 'auth-links');
-      if (mode === 'in') row.append(linkBtn(t('a-to-up'), () => renderAuth('up')), linkBtn(t('a-to-reset'), () => renderAuth('reset')));
-      else row.append(linkBtn(t('a-to-in'), () => renderAuth('in')));
+      row.append(
+        linkBtn(t('a-resend'), async () => { try { await sendLink(S.sentTo); say({ kind: 'ok', key: 'a-resent' }); } catch (e) { say({ kind: 'err', raw: authError(e) }); } }),
+        linkBtn(t('a-other'), () => renderAuth('in')));
       card.append(row);
+    } else {
+      const title = mode === 'confirm' ? 'a-confirm' : 'a-in';
+      card.append(el('h2', null, t(title)), el('p', 'sub', fill(t(title + '-sub'))));
+      const f = el('div', 'field'); const l = el('label', 'label', t('a-email')); l.htmlFor = 'a-email';
+      const i = el('input'); i.type = 'email'; i.id = 'a-email'; i.autocomplete = 'email'; i.inputMode = 'email';
+      i.placeholder = 'navn@' + allowedDomain; i.value = typed || (mode === 'in' ? S.sentTo || '' : '');
+      f.append(l, i); card.append(f, msgBox);
+      say(note);
+      const go = el('button', 'submit', t(title + '-go')); go.type = 'submit'; card.append(go);
+      if (mode === 'confirm') {
+        const row = el('div', 'auth-links');
+        row.append(linkBtn(t('a-new-link'), () => { history.replaceState(null, '', location.pathname); renderAuth('in'); }));
+        card.append(row);
+      }
       card.addEventListener('submit', async e => {
         e.preventDefault();
-        const email = lc($('a-email').value.trim()), pass = $('a-pass') ? $('a-pass').value : '', name = $('a-name') ? $('a-name').value.trim() : '';
-        const fail = text => { msgBox.textContent = ''; msgBox.append(el('div', 'msg err', text)); };
-        if (!EMAIL.test(email)) { $('a-email').focus(); return fail(t('a-err-email')); }
-        if (allowedDomain && !email.endsWith('@' + lc(allowedDomain))) { $('a-email').focus(); return fail(t('err-domain').replace('{d}', allowedDomain)); }
-        if (mode === 'up' && !name) { $('a-name').focus(); return fail(t('a-err-name')); }
-        if (mode === 'up' && pass.length < 8) { $('a-pass').focus(); return fail(t('a-err-weak')); }
-        if (mode === 'in' && !pass) { $('a-pass').focus(); return fail(t('a-err-cred')); }
+        const email = lc(i.value.trim());
+        if (!EMAIL.test(email)) { i.focus(); return say({ kind: 'err', key: 'a-err-email' }); }
+        if (!okDomain(email)) { i.focus(); return say({ kind: 'err', key: 'err-domain' }); }
         go.disabled = true;
         try {
-          if (mode === 'in') await signInWithEmailAndPassword(S.auth, email, pass);
-          else if (mode === 'up') {
-            const cred = await createUserWithEmailAndPassword(S.auth, email, pass);
-            await updateProfile(cred.user, { displayName: name });
-            await sendEmailVerification(cred.user);
-            renderAuth('verify');
-          } else {
-            await sendPasswordResetEmail(S.auth, email);
-            renderAuth('in', { kind: 'ok', key: 'a-reset-sent' });
-          }
-        } catch (err) { console.error(err); fail(authError(err)); }
+          if (mode === 'confirm') await finishLink(email);
+          else { await sendLink(email); renderAuth('sent', { email }); }
+        } catch (err) { console.error(err); say({ kind: 'err', raw: authError(err) }); }
         go.disabled = false;
       });
     }
     box.append(card);
   }
-  // After clicking the link in the mail, the person comes back here; pick up the confirmed status.
-  async function checkVerified(fromButton) {
-    const u = S.auth && S.auth.currentUser;
-    if (!u || S.uid) return;
-    try { await u.reload(); } catch (e) { return; }
-    if (u.emailVerified) { await u.getIdToken(true); onUser(u); }
-    else if (fromButton) renderAuth('verify', { kind: 'warn', key: 'a-not-yet' });
+  async function sendLink(email) {
+    await sendSignInLinkToEmail(S.auth, email, { url: location.origin + location.pathname, handleCodeInApp: true });
+    store.set(LINK_EMAIL, email);
   }
-  window.addEventListener('focus', () => { if (S.authMode === 'verify') checkVerified(false); });
+  async function finishLink(email) {
+    S.finishing = true;
+    try {
+      await signInWithEmailLink(S.auth, email, location.href);
+      try { localStorage.removeItem(LINK_EMAIL); } catch (e) { }
+      history.replaceState(null, '', location.pathname); // drop the one-time code from the address bar
+    } finally { S.finishing = false; }
+    // onAuthStateChanged takes it from here.
+  }
+  // Opening the link from the mail lands here with a one-time code in the address.
+  async function handleIncomingLink() {
+    if (!isSignInWithEmailLink(S.auth, location.href)) return false;
+    const email = store.get(LINK_EMAIL);
+    if (!email) { renderAuth('confirm'); return true; } // opened on another device or browser
+    try { await finishLink(email); }
+    catch (e) {
+      console.error(e);
+      history.replaceState(null, '', location.pathname);
+      renderAuth('in', { kind: 'err', raw: authError(e) });
+    }
+    return true;
+  }
   $('signout').addEventListener('click', () => signOut(S.auth));
 
   /* ---------- data ---------- */
@@ -1000,25 +997,30 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
   }
 
   async function onUser(u) {
+    const run = ++S.run; // a newer sign-in state replaces this one while it is still loading
     stopListening();
     if (S.drawer) closeDrawer();
     S.uid = null; S.myEmail = null; S.myName = ''; S.admin = false; S.tab = null;
     $('me').hidden = true; $('author-field').hidden = true;
-    if (!u) { renderAuth(S.authMode === 'up' || S.authMode === 'reset' ? S.authMode : 'in'); return; }
+    if (!u) {
+      if (S.finishing) return; // the sign-in link is being used right now
+      renderAuth(S.authMode === 'sent' || S.authMode === 'confirm' ? S.authMode : 'in', S.authNote);
+      return;
+    }
     const email = lc(u.email || '');
-    if (!email || (allowedDomain && !email.endsWith('@' + lc(allowedDomain)))) {
+    // Only people who came in through a link sent to a @vicuras.dk address (firestore.rules checks the same).
+    if (!email || !okDomain(email) || !u.emailVerified) {
       await signOut(S.auth); renderAuth('in', { kind: 'err', key: 'err-domain' }); return;
     }
-    $('me-name').textContent = u.displayName || email; $('me').hidden = false;
-    if (!u.emailVerified) { if (S.authMode !== 'verify') renderAuth('verify'); return; }
-    S.uid = u.uid; S.myEmail = email; S.myName = u.displayName || '';
-    S.notice = null; S.authMode = null;
+    S.uid = u.uid; S.myEmail = email; S.myName = u.displayName || nameFromEmail(email);
+    $('me-name').textContent = S.myName; $('me').hidden = false;
+    S.notice = null; S.authMode = null; S.authNote = null;
     $('list').textContent = '';
     const g = el('div', 'grid'); const e = el('div', 'empty'); e.append(el('b', null, t('loading'))); g.append(e); $('list').append(g);
     // Keep a small profile so editors can show a name on reports they file for someone.
     setDoc(doc(S.db, 'users', u.uid), { email, name: S.myName, lastSeen: serverTimestamp() }).catch(() => { });
     try { S.admin = (await getDoc(doc(S.db, 'admins', email))).exists(); } catch (e) { S.admin = false; }
-    if (S.uid !== u.uid) return; // signed out meanwhile
+    if (run !== S.run) return; // signed out or switched account meanwhile
     S.tab = S.admin ? 'all' : 'mine';
     $('author-field').hidden = !S.admin;
     const fail = err => { console.error(err); showNotice('err-load'); };
@@ -1040,6 +1042,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     const app = initializeApp(firebaseConfig);
     S.auth = getAuth(app); S.auth.languageCode = S.lang;
     S.db = getFirestore(app);
+    handleIncomingLink();
     onAuthStateChanged(S.auth, onUser);
   }
   start();
