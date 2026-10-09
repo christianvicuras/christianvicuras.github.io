@@ -1,0 +1,71 @@
+rules_version = '2';
+
+// Security rules for the TeamLead page. Paste into Firebase console → Firestore Database → Rules, then Publish.
+//
+// reports/{id}             one document per report; owner = who submitted it, authorEmail = whose report it is
+// reports/{id}/shots/{id}  the screenshots of a report, one per document
+// users/{uid}              name and email of everyone who has signed in (so editors can name reports filed for someone)
+// admins/{email}           editors (Louise, Daniel, Christian); the document id is the lowercase email, the contents don't matter
+//
+// A TeamLead can read the shared reports plus their own, and can only create reports in their own name.
+// Only editors see every report (also those only for Louise) and can change status and reply.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function email() { return request.auth.token.email.lower(); }
+    function isVicuras() {
+      return request.auth != null && request.auth.token.email is string
+        && email().matches('.*@vicuras[.]dk');
+    }
+    function isAdmin() { return isVicuras() && exists(/databases/$(database)/documents/admins/$(email())); }
+    function canRead(r) {
+      return isAdmin() || (isVicuras() && (r.private == false || r.authorEmail == email() || r.owner == request.auth.uid));
+    }
+    function validNewReport(d) {
+      return d.keys().hasOnly(['type', 'area', 'title', 'text', 'shots', 'createdAt', 'status', 'reply', 'private', 'owner', 'authorEmail', 'authorName'])
+        && d.owner == request.auth.uid
+        && d.type in ['bug', 'feedback', 'idea']
+        && d.area in ['app', 'd365']
+        && d.title is string && d.title.size() > 0 && d.title.size() <= 140
+        && d.text is string && d.text.size() <= 4000
+        && d.shots is list && d.shots.size() <= 5
+        && d.createdAt == request.time
+        && d.status == 'new' && d.reply == ''
+        && d.private is bool
+        && d.authorName is string && d.authorName.size() <= 200
+        && d.authorEmail is string && (d.authorEmail == email() || isAdmin());
+    }
+
+    match /admins/{adminEmail} {
+      allow read: if isVicuras() && (adminEmail == email() || isAdmin());
+      allow write: if false; // manage editors in the Firebase console
+    }
+
+    match /users/{uid} {
+      allow read: if isAdmin() || (isVicuras() && request.auth.uid == uid);
+      allow write: if isVicuras() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'name', 'lastSeen'])
+        && request.resource.data.email == email();
+    }
+
+    match /reports/{reportId} {
+      allow read: if canRead(resource.data);
+      allow create: if isVicuras() && validNewReport(request.resource.data);
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reply', 'repliedAt'])
+        && request.resource.data.status in ['new', 'progress', 'done', 'declined']
+        && request.resource.data.reply is string && request.resource.data.reply.size() <= 2000;
+      allow delete: if isAdmin();
+
+      match /shots/{shotId} {
+        allow read: if canRead(get(/databases/$(database)/documents/reports/$(reportId)).data);
+        // Written in the same batch as the report, so check the report as it will be after the write.
+        allow create: if isVicuras()
+          && getAfter(/databases/$(database)/documents/reports/$(reportId)).data.owner == request.auth.uid
+          && request.resource.data.keys().hasOnly(['data', 'w', 'h'])
+          && request.resource.data.data is string && request.resource.data.data.size() <= 240000;
+        allow delete: if isAdmin();
+      }
+    }
+  }
+}
