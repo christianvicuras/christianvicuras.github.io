@@ -216,6 +216,9 @@ textarea { min-height: 130px; resize: vertical; }
 .status-pick button[aria-pressed="true"] { border-color: var(--accent); background: var(--soft); color: var(--accent); }
 .adm textarea { min-height: 90px; }
 .adm-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.adm-row .sep { flex: 1; }
+.adm input { width: 100%; border: 1.5px solid var(--line); border-radius: var(--r-el); background: var(--bg); padding: 9px 12px; }
+.btn.danger { border-color: var(--bug); color: var(--bug); }
 
 .viewer { position: fixed; inset: 0; background: rgba(15,12,14,.88); display: grid; place-items: center; padding: 24px; z-index: 40; cursor: zoom-out; }
 .viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; }
@@ -356,7 +359,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       lead: 'Fortæl os, hvad der driller, og hvad der kan blive bedre i appen og i D365. Det tager et minut.',
       cta: 'Meld noget ind', new: 'Ny indmelding', 'q-type': 'Hvad vil du melde?', bug: 'Fejl', feedback: 'Feedback', idea: 'Ny idé',
       bugs: 'Fejl', feedbacks: 'Feedback', ideas: 'Idéer', total: 'I alt',
-      'solved-of': '{d} af {n} løst', 'all-solved': 'Alle løst', 'none-yet': 'Ingen endnu', 'none-open': 'Ingen åbne',
+      'solved-of': '{d} af {n} løst', 'all-solved': 'Alle løst', 'none-yet': 'Ingen endnu', 'none-open': 'Ingen åbne', 'total-hint': 'Fejl og feedback. Idéer tæller ikke med.',
       'q-area': 'Hvor?', app: 'Appen', 'app-sub': 'Vicuras-appen på telefonen', 'd365-sub': 'Dynamics i browseren',
       'q-title': 'Overskrift', 'q-text': 'Beskrivelse', 'q-shots': 'Skærmbilleder',
       'ph-title': { bug: 'Fx: Vagtplanen viser ikke mine vagter', feedback: 'Fx: Det er svært at finde mit team', idea: 'Fx: Påmindelse dagen før et event' },
@@ -401,6 +404,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       status: { new: 'Ny', progress: 'I gang', done: 'Løst', declined: 'Afvist' },
       'any-area': 'Appen og D365', 'any-status': 'Alle statusser',
       reply: 'Svar', 'reply-ph': 'Svar til TeamLeaden (valgfrit)', save: 'Gem', saved: 'Gemt', manage: 'Status og svar',
+      delete: 'Slet', 'confirm-delete': 'Slet "{t}"? Det kan ikke fortrydes.', 'err-author': 'Kunne ikke gemme. Indmeldt af skal være en person med adgang til siden.',
       'shots-loading': 'Henter skærmbilleder …', 'shot-missing': 'Skærmbilledet kunne ikke hentes.',
       'too-many': 'Højst 5 skærmbilleder pr. indmelding.', remove: 'Fjern billede', close: 'Luk'
     },
@@ -409,7 +413,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       lead: 'Tell us what is bugging you and what could be better in the app and in D365. It takes a minute.',
       cta: 'Report something', new: 'New report', 'q-type': 'What do you want to report?', bug: 'Bug', feedback: 'Feedback', idea: 'New idea',
       bugs: 'Bugs', feedbacks: 'Feedback', ideas: 'Ideas', total: 'Total',
-      'solved-of': '{d} of {n} solved', 'all-solved': 'All solved', 'none-yet': 'None yet', 'none-open': 'Nothing open',
+      'solved-of': '{d} of {n} solved', 'all-solved': 'All solved', 'none-yet': 'None yet', 'none-open': 'Nothing open', 'total-hint': 'Bugs and feedback. Ideas aren’t counted.',
       'q-area': 'Where?', app: 'The app', 'app-sub': 'The Vicuras app on your phone', 'd365-sub': 'Dynamics in the browser',
       'q-title': 'Title', 'q-text': 'Description', 'q-shots': 'Screenshots',
       'ph-title': { bug: 'E.g. My shifts don’t show in the schedule', feedback: 'E.g. It’s hard to find my team', idea: 'E.g. A reminder the day before an event' },
@@ -454,6 +458,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       status: { new: 'New', progress: 'In progress', done: 'Solved', declined: 'Declined' },
       'any-area': 'App and D365', 'any-status': 'All statuses',
       reply: 'Reply', 'reply-ph': 'Reply to the TeamLead (optional)', save: 'Save', saved: 'Saved', manage: 'Status and reply',
+      delete: 'Delete', 'confirm-delete': 'Delete "{t}"? This can’t be undone.', 'err-author': 'Couldn’t save. Reported by must be someone with access to the page.',
       'shots-loading': 'Loading screenshots …', 'shot-missing': 'The screenshot couldn’t be loaded.',
       'too-many': 'At most 5 screenshots per report.', remove: 'Remove image', close: 'Close'
     }
@@ -492,7 +497,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
   function isMine(i) { return !!S.myEmail && lc(i.authorEmail) === S.myEmail; }
   function authorName(i) {
     if (isMine(i)) return t('you');
-    return i.authorName || i.authorEmail || t('someone');
+    return i.authorName || (i.authorEmail && nameFromEmail(i.authorEmail)) || t('someone');
   }
 
   /* ---------- language ---------- */
@@ -630,8 +635,8 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
   async function nameFor(email) {
     try {
       const hits = await getDocs(query(collection(S.db, 'users'), where('email', '==', email)));
-      return hits.empty ? '' : (hits.docs[0].data().name || '');
-    } catch (e) { return ''; }
+      return (!hits.empty && hits.docs[0].data().name) || nameFromEmail(email);
+    } catch (e) { return nameFromEmail(email); }
   }
 
   function saveError(err) {
@@ -734,7 +739,8 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     } catch (e) { return ''; }
   }
 
-  // Summary tiles: how many there are of each kind, and how many are solved. Declined reports don't count towards "X af Y løst".
+  // Summary tiles: how many there are of each kind, and how many are solved. Declined reports don't count towards "X af Y løst",
+  // and on the total tile neither do ideas: they get built, not solved.
   function renderStats(base) {
     const box = $('stats'); box.textContent = '';
     const defs = [['', 'all', t('total')], ['bug', 'bug', t('bugs')], ['feedback', 'feedback', t('feedbacks')], ['idea', 'idea', t('ideas')]];
@@ -742,8 +748,9 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     defs.forEach(([v, icon, label]) => {
       const items = v ? pool.filter(i => i.type === v) : pool;
       const n = items.length;
-      const done = items.filter(i => i.status === 'done').length;
-      const toSolve = n - items.filter(i => i.status === 'declined').length;
+      const solvable = v ? items : items.filter(i => i.type !== 'idea');
+      const done = solvable.filter(i => i.status === 'done').length;
+      const toSolve = solvable.filter(i => i.status !== 'declined').length;
       const closed = toSolve > 0 && done === toSolve;
       const b = el('button', 'stat' + (closed ? ' complete' : '')); b.type = 'button'; b.id = 'stat-' + (v || 'all');
       b.setAttribute('aria-pressed', S.f.type === v);
@@ -758,6 +765,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       bar.append(fd);
       const line = el('span', 'prog-l' + (done ? ' some' : ''));
       if (closed) line.innerHTML = ICON.check;
+      if (!v) line.title = t('total-hint');
       line.append(!n ? t('none-yet') : !toSolve ? t('none-open') : closed ? t('all-solved') : t('solved-of').replace('{d}', done).replace('{n}', toSolve));
       prog.append(bar, line);
       b.append(top, prog);
@@ -888,19 +896,39 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     });
     const rl = el('label', 'label', t('reply')); rl.htmlFor = 'rp-' + it.id;
     const ta = el('textarea'); ta.id = 'rp-' + it.id; ta.placeholder = t('reply-ph'); ta.value = it.reply || ''; ta.maxLength = 2000;
+    // Who the report belongs to: editors can move it to the person it came from (it then shows under their Mine).
+    const al = el('label', 'label', t('q-author')); al.htmlFor = 'au-' + it.id;
+    const au = el('input'); au.type = 'text'; au.id = 'au-' + it.id; au.inputMode = 'email'; au.autocomplete = 'off';
+    au.value = it.authorEmail || ''; au.placeholder = 'navn@' + allowedDomain;
     const row = el('div', 'adm-row');
     const save = el('button', 'btn solid', t('save')); save.type = 'button';
+    const del = el('button', 'btn danger', t('delete')); del.type = 'button';
     const note = el('span', 'sub', '');
     save.addEventListener('click', async () => {
+      const email = lc(au.value.trim());
+      if (!EMAIL.test(email)) { au.focus(); note.textContent = t('bad-author'); return; }
       save.disabled = true; note.textContent = '';
       try {
-        await updateDoc(doc(S.db, 'reports', it.id), { status, reply: ta.value.trim(), repliedAt: serverTimestamp() });
+        const change = { status, reply: ta.value.trim(), repliedAt: serverTimestamp() };
+        if (email !== lc(it.authorEmail)) Object.assign(change, { authorEmail: email, authorName: await nameFor(email) });
+        await updateDoc(doc(S.db, 'reports', it.id), change);
         note.textContent = t('saved');
-      } catch (e) { note.textContent = saveError(e); }
+      } catch (e) { note.textContent = e && e.code === 'permission-denied' ? t('err-author') : saveError(e); }
       save.disabled = false;
     });
-    row.append(save, note);
-    box.append(pick, rl, ta, row);
+    del.addEventListener('click', async () => {
+      if (!confirm(t('confirm-delete').replace('{t}', it.title))) return;
+      del.disabled = true; note.textContent = '';
+      try {
+        const batch = writeBatch(S.db);
+        (it.shots || []).forEach(sid => batch.delete(doc(S.db, 'reports', it.id, 'shots', sid)));
+        batch.delete(doc(S.db, 'reports', it.id));
+        await batch.commit();
+        closeDrawer();
+      } catch (e) { note.textContent = saveError(e); del.disabled = false; }
+    });
+    row.append(save, note, el('span', 'sep'), del);
+    box.append(pick, rl, ta, al, au, row);
     return box;
   }
 

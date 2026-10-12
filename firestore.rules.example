@@ -51,10 +51,13 @@ service cloud.firestore {
     match /reports/{reportId} {
       allow read: if canRead(resource.data);
       allow create: if isVicuras() && validNewReport(request.resource.data);
+      // Editors set status and reply, and can move a report to the person it came from (only someone on the lists).
       allow update: if isAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reply', 'repliedAt'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reply', 'repliedAt', 'authorEmail', 'authorName'])
         && request.resource.data.status in ['new', 'progress', 'done', 'declined']
-        && request.resource.data.reply is string && request.resource.data.reply.size() <= 2000;
+        && request.resource.data.reply is string && request.resource.data.reply.size() <= 2000
+        && (request.resource.data.authorEmail in editors() || request.resource.data.authorEmail in teamLeads())
+        && request.resource.data.authorName is string && request.resource.data.authorName.size() <= 200;
       allow delete: if isAdmin();
 
       match /shots/{shotId} {
