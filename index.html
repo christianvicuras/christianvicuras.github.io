@@ -73,7 +73,18 @@ h1 { margin: 2px 0 0; font-size: clamp(26px, 3.4vw, 38px); font-weight: 800; let
 /* summary strip */
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: -18px; }
 @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.stat { all: unset; box-sizing: border-box; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 14px 16px; display: flex; gap: 12px; align-items: center; box-shadow: var(--shadow); }
+.stat { all: unset; box-sizing: border-box; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); min-width: 0; transition: background .25s, border-color .25s; }
+.stat-top { display: flex; gap: 12px; align-items: center; }
+.prog { display: flex; flex-direction: column; gap: 6px; }
+.bar { display: flex; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; transition: width .5s ease; }
+.bar .d { background: var(--ok); }
+.bar .x { background: color-mix(in srgb, var(--muted) 45%, transparent); }
+.prog-l { display: flex; gap: 5px; align-items: center; font-size: 12.5px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prog-l.some { color: var(--ok); }
+.prog-l svg { width: 14px; height: 14px; stroke: currentColor; flex: none; }
+.stat.complete { background: color-mix(in srgb, var(--idea-soft) 70%, var(--surface)); border-color: color-mix(in srgb, var(--ok) 40%, var(--line)); }
+.stat.complete .prog-l { color: var(--ok); }
 .stat[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
 .stat:focus-visible { outline: 3px solid var(--rose); }
 .stat .n { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
@@ -346,6 +357,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       lead: 'Fortæl os, hvad der driller, og hvad der kan blive bedre i appen og i D365. Det tager et minut.',
       cta: 'Meld noget ind', new: 'Ny indmelding', 'q-type': 'Hvad vil du melde?', bug: 'Fejl', feedback: 'Feedback', idea: 'Ny idé',
       bugs: 'Fejl', feedbacks: 'Feedback', ideas: 'Idéer', total: 'I alt',
+      'solved-of': '{d} af {n} løst', 'all-solved': 'Alle løst', 'none-yet': 'Ingen endnu',
       'q-area': 'Hvor?', app: 'Appen', 'app-sub': 'Vicuras-appen på telefonen', 'd365-sub': 'Dynamics i browseren',
       'q-title': 'Overskrift', 'q-text': 'Beskrivelse', 'q-shots': 'Skærmbilleder',
       'ph-title': { bug: 'Fx: Vagtplanen viser ikke mine vagter', feedback: 'Fx: Det er svært at finde mit team', idea: 'Fx: Påmindelse dagen før et event' },
@@ -398,6 +410,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       lead: 'Tell us what is bugging you and what could be better in the app and in D365. It takes a minute.',
       cta: 'Report something', new: 'New report', 'q-type': 'What do you want to report?', bug: 'Bug', feedback: 'Feedback', idea: 'New idea',
       bugs: 'Bugs', feedbacks: 'Feedback', ideas: 'Ideas', total: 'Total',
+      'solved-of': '{d} of {n} solved', 'all-solved': 'All solved', 'none-yet': 'None yet',
       'q-area': 'Where?', app: 'The app', 'app-sub': 'The Vicuras app on your phone', 'd365-sub': 'Dynamics in the browser',
       'q-title': 'Title', 'q-text': 'Description', 'q-shots': 'Screenshots',
       'ph-title': { bug: 'E.g. My shifts don’t show in the schedule', feedback: 'E.g. It’s hard to find my team', idea: 'E.g. A reminder the day before an event' },
@@ -452,6 +465,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     idea: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>',
     all: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h9"/></svg>',
     img: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
     reply: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v4"/></svg>'
   };
   const STATUSES = ['new', 'progress', 'done', 'declined'];
@@ -691,12 +705,12 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     if (S.tab === 'others') return list.filter(i => !isMine(i) && !i.private);
     return list;
   }
-  function applyFilters(list, skipType) {
+  function applyFilters(list, forTiles) {
     const q = lc(S.f.q.trim());
     return list.filter(i =>
-      (skipType || !S.f.type || i.type === S.f.type) &&
+      (forTiles || !S.f.type || i.type === S.f.type) &&
       (!S.f.area || i.area === S.f.area) &&
-      (S.view === 'board' || !S.f.status || (i.status || 'new') === S.f.status) &&
+      (forTiles || S.view === 'board' || !S.f.status || (i.status || 'new') === S.f.status) &&
       (!q || lc(i.title).includes(q) || lc(i.text).includes(q) || lc(authorName(i)).includes(q)));
   }
   function renderFilters() {
@@ -721,17 +735,35 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     } catch (e) { return ''; }
   }
 
+  // Summary tiles: how many there are of each kind, and how many of those are solved.
   function renderStats(base) {
     const box = $('stats'); box.textContent = '';
     const defs = [['', 'all', t('total')], ['bug', 'bug', t('bugs')], ['feedback', 'feedback', t('feedbacks')], ['idea', 'idea', t('ideas')]];
     const pool = applyFilters(base, true);
     defs.forEach(([v, icon, label]) => {
-      const b = el('button', 'stat'); b.type = 'button'; b.id = 'stat-' + (v || 'all');
+      const items = v ? pool.filter(i => i.type === v) : pool;
+      const n = items.length;
+      const done = items.filter(i => i.status === 'done').length;
+      const declined = items.filter(i => i.status === 'declined').length;
+      const closed = n > 0 && done + declined === n;
+      const b = el('button', 'stat' + (closed ? ' complete' : '')); b.type = 'button'; b.id = 'stat-' + (v || 'all');
       b.setAttribute('aria-pressed', S.f.type === v);
+      const top = el('span', 'stat-top');
       const d = el('span', 'dot ' + (v || 'feedback')); d.innerHTML = ICON[icon];
       if (!v) d.style.background = 'var(--soft)', d.querySelector('svg').style.stroke = 'var(--accent)';
-      const txt = el('span'); txt.append(el('div', 'n', String(v ? pool.filter(i => i.type === v).length : pool.length)), el('div', 'l', label));
-      b.append(d, txt);
+      const txt = el('span'); txt.append(el('div', 'n', String(n)), el('div', 'l', label));
+      top.append(d, txt);
+      const prog = el('span', 'prog');
+      const bar = el('span', 'bar'); bar.setAttribute('aria-hidden', 'true');
+      const pct = x => (n ? (x / n) * 100 : 0) + '%';
+      const fd = el('i', 'd'); fd.style.width = pct(done);
+      const fx = el('i', 'x'); fx.style.width = pct(declined);
+      bar.append(fd, fx);
+      const line = el('span', 'prog-l' + (done ? ' some' : ''));
+      if (closed) line.innerHTML = ICON.check;
+      line.append(!n ? t('none-yet') : closed && declined === 0 ? t('all-solved') : t('solved-of').replace('{d}', done).replace('{n}', n));
+      prog.append(bar, line);
+      b.append(top, prog);
       b.addEventListener('click', () => { S.f.type = S.f.type === v ? '' : v; render(); });
       box.append(b);
     });
