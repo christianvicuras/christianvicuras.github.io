@@ -79,7 +79,6 @@ h1 { margin: 2px 0 0; font-size: clamp(26px, 3.4vw, 38px); font-weight: 800; let
 .bar { display: flex; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
 .bar i { display: block; height: 100%; transition: width .5s ease; }
 .bar .d { background: var(--ok); }
-.bar .x { background: color-mix(in srgb, var(--muted) 45%, transparent); }
 .prog-l { display: flex; gap: 5px; align-items: center; font-size: 12.5px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .prog-l.some { color: var(--ok); }
 .prog-l svg { width: 14px; height: 14px; stroke: currentColor; flex: none; }
@@ -357,7 +356,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       lead: 'Fortæl os, hvad der driller, og hvad der kan blive bedre i appen og i D365. Det tager et minut.',
       cta: 'Meld noget ind', new: 'Ny indmelding', 'q-type': 'Hvad vil du melde?', bug: 'Fejl', feedback: 'Feedback', idea: 'Ny idé',
       bugs: 'Fejl', feedbacks: 'Feedback', ideas: 'Idéer', total: 'I alt',
-      'solved-of': '{d} af {n} løst', 'all-solved': 'Alle løst', 'none-yet': 'Ingen endnu',
+      'solved-of': '{d} af {n} løst', 'all-solved': 'Alle løst', 'none-yet': 'Ingen endnu', 'none-open': 'Ingen åbne',
       'q-area': 'Hvor?', app: 'Appen', 'app-sub': 'Vicuras-appen på telefonen', 'd365-sub': 'Dynamics i browseren',
       'q-title': 'Overskrift', 'q-text': 'Beskrivelse', 'q-shots': 'Skærmbilleder',
       'ph-title': { bug: 'Fx: Vagtplanen viser ikke mine vagter', feedback: 'Fx: Det er svært at finde mit team', idea: 'Fx: Påmindelse dagen før et event' },
@@ -410,7 +409,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       lead: 'Tell us what is bugging you and what could be better in the app and in D365. It takes a minute.',
       cta: 'Report something', new: 'New report', 'q-type': 'What do you want to report?', bug: 'Bug', feedback: 'Feedback', idea: 'New idea',
       bugs: 'Bugs', feedbacks: 'Feedback', ideas: 'Ideas', total: 'Total',
-      'solved-of': '{d} of {n} solved', 'all-solved': 'All solved', 'none-yet': 'None yet',
+      'solved-of': '{d} of {n} solved', 'all-solved': 'All solved', 'none-yet': 'None yet', 'none-open': 'Nothing open',
       'q-area': 'Where?', app: 'The app', 'app-sub': 'The Vicuras app on your phone', 'd365-sub': 'Dynamics in the browser',
       'q-title': 'Title', 'q-text': 'Description', 'q-shots': 'Screenshots',
       'ph-title': { bug: 'E.g. My shifts don’t show in the schedule', feedback: 'E.g. It’s hard to find my team', idea: 'E.g. A reminder the day before an event' },
@@ -735,7 +734,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     } catch (e) { return ''; }
   }
 
-  // Summary tiles: how many there are of each kind, and how many of those are solved.
+  // Summary tiles: how many there are of each kind, and how many are solved. Declined reports don't count towards "X af Y løst".
   function renderStats(base) {
     const box = $('stats'); box.textContent = '';
     const defs = [['', 'all', t('total')], ['bug', 'bug', t('bugs')], ['feedback', 'feedback', t('feedbacks')], ['idea', 'idea', t('ideas')]];
@@ -744,8 +743,8 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       const items = v ? pool.filter(i => i.type === v) : pool;
       const n = items.length;
       const done = items.filter(i => i.status === 'done').length;
-      const declined = items.filter(i => i.status === 'declined').length;
-      const closed = n > 0 && done + declined === n;
+      const toSolve = n - items.filter(i => i.status === 'declined').length;
+      const closed = toSolve > 0 && done === toSolve;
       const b = el('button', 'stat' + (closed ? ' complete' : '')); b.type = 'button'; b.id = 'stat-' + (v || 'all');
       b.setAttribute('aria-pressed', S.f.type === v);
       const top = el('span', 'stat-top');
@@ -755,13 +754,11 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       top.append(d, txt);
       const prog = el('span', 'prog');
       const bar = el('span', 'bar'); bar.setAttribute('aria-hidden', 'true');
-      const pct = x => (n ? (x / n) * 100 : 0) + '%';
-      const fd = el('i', 'd'); fd.style.width = pct(done);
-      const fx = el('i', 'x'); fx.style.width = pct(declined);
-      bar.append(fd, fx);
+      const fd = el('i', 'd'); fd.style.width = (toSolve ? (done / toSolve) * 100 : 0) + '%';
+      bar.append(fd);
       const line = el('span', 'prog-l' + (done ? ' some' : ''));
       if (closed) line.innerHTML = ICON.check;
-      line.append(!n ? t('none-yet') : closed && declined === 0 ? t('all-solved') : t('solved-of').replace('{d}', done).replace('{n}', n));
+      line.append(!n ? t('none-yet') : !toSolve ? t('none-open') : closed ? t('all-solved') : t('solved-of').replace('{d}', done).replace('{n}', toSolve));
       prog.append(bar, line);
       b.append(top, prog);
       b.addEventListener('click', () => { S.f.type = S.f.type === v ? '' : v; render(); });
