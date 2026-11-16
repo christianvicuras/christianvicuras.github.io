@@ -5,6 +5,7 @@ rules_version = '2';
 // reports/{id}             one document per report; owner = who submitted it, authorEmail = whose report it is
 // reports/{id}/shots/{id}  the screenshots of a report, one per document
 // users/{uid}              name and email of everyone who has signed in (so editors can name reports filed for someone)
+// releases/{version}       one document per app release ("1.9.9"): its date and an optional note; reports.release names one
 //
 // Only the people listed below get in. Accounts are created by hand in the Firebase console (Authentication → Users).
 // A TeamLead can read the shared reports plus their own, and can only create reports in their own name.
@@ -48,12 +49,26 @@ service cloud.firestore {
         && request.resource.data.email == email();
     }
 
+    // The app's releases. Everyone with access reads them; editors make them.
+    match /releases/{releaseId} {
+      allow read: if isVicuras();
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['version', 'date', 'notes', 'createdAt'])
+        && request.resource.data.version == releaseId
+        && releaseId.size() > 0 && releaseId.size() <= 20
+        && request.resource.data.date is string && request.resource.data.date.size() <= 10
+        && request.resource.data.notes is string && request.resource.data.notes.size() <= 2000;
+      allow delete: if isAdmin();
+    }
+
     match /reports/{reportId} {
       allow read: if canRead(resource.data);
       allow create: if isVicuras() && validNewReport(request.resource.data);
-      // Editors set status and reply, and can move a report to the person it came from (only someone on the lists).
+      // Editors set status, reply and the release it was solved in, and can move a report to the person it came
+      // from (only someone on the lists).
       allow update: if isAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reply', 'repliedAt', 'authorEmail', 'authorName'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reply', 'repliedAt', 'authorEmail', 'authorName', 'release'])
+        && (!('release' in request.resource.data) || (request.resource.data.release is string && request.resource.data.release.size() <= 20))
         && request.resource.data.status in ['new', 'progress', 'done', 'declined']
         && request.resource.data.reply is string && request.resource.data.reply.size() <= 2000
         && (request.resource.data.authorEmail in editors() || request.resource.data.authorEmail in teamLeads())

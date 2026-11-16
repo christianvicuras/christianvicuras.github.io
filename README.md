@@ -13,6 +13,17 @@ security rules decide who sees what:
 
 Only the emails listed in the rules get in, whatever accounts exist.
 
+## Releases
+
+Reports are grouped by the app version they were solved in. An editor opens a report, picks its **Version** (or
+creates a new one: number and date) and saves. The **Versioner / Releases** tab lists each release, newest first, with
+its bugs and feedback; editors also see the solved reports that have no version yet. The **Fejl rettet / Bugs fixed**
+tile counts every bug marked Solved, and in how many releases.
+
+- `releases/{version}` (e.g. `releases/1.9.9`): `version`, `date` (`YYYY-MM-DD`), `notes`, `createdAt`. Everyone with
+  access reads them; only editors write them.
+- `reports/{id}.release`: the version it was solved in (`""` for none). Only editors set it.
+
 ## Firebase project
 
 Project **vicuras-teamlead** (Spark/free plan), console: <https://console.firebase.google.com/project/vicuras-teamlead/overview>

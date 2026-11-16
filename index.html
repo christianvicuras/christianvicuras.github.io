@@ -71,8 +71,23 @@ h1 { margin: 2px 0 0; font-size: clamp(26px, 3.4vw, 38px); font-weight: 800; let
 .signout { background: none; border: 1.5px solid var(--band-kicker); color: var(--band-fg); border-radius: 999px; padding: 5px 12px; font-weight: 700; font-size: 13px; cursor: pointer; }
 
 /* summary strip */
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: -18px; }
+.stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: -18px; }
+@media (max-width: 1000px) { .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Releases: one block per version, newest first, with the reports solved in it. */
+.stat.fixed .n { color: var(--ok); }
+.chip.ver { color: var(--accent); border-color: var(--rose); text-transform: none; letter-spacing: 0; }
+.rels { display: flex; flex-direction: column; gap: 18px; padding-bottom: 56px; }
+.rel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px 18px 18px; box-shadow: var(--shadow); }
+.rel-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 4px; }
+.rel-v { font-size: 22px; font-weight: 800; color: var(--fg); }
+.rel-date { color: var(--muted); font-size: 13.5px; }
+.rel-counts { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.rel-notes { margin: 6px 0 0; color: var(--muted); white-space: pre-wrap; font-size: 14px; max-width: 70ch; }
+.rel .grid { padding: 14px 0 0; }
+.rel.unrel { background: transparent; box-shadow: none; border-style: dashed; }
+.rel-add { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; align-items: center; margin-top: 8px; }
+@media (max-width: 520px) { .rel-add { grid-template-columns: 1fr 1fr; } .rel-add .btn { grid-column: 1 / -1; } }
 .stat { all: unset; box-sizing: border-box; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); min-width: 0; transition: background .25s, border-color .25s; }
 .stat-top { display: flex; gap: 12px; align-items: center; }
 .prog { display: flex; flex-direction: column; gap: 6px; }
@@ -406,7 +421,15 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       reply: 'Svar', 'reply-ph': 'Svar til TeamLeaden (valgfrit)', save: 'Gem', saved: 'Gemt', manage: 'Status og svar',
       delete: 'Slet', 'confirm-delete': 'Slet "{t}"? Det kan ikke fortrydes.', 'err-author': 'Kunne ikke gemme. Indmeldt af skal være en person med adgang til siden.',
       'shots-loading': 'Henter skærmbilleder …', 'shot-missing': 'Skærmbilledet kunne ikke hentes.',
-      'too-many': 'Højst 5 skærmbilleder pr. indmelding.', remove: 'Fjern billede', close: 'Luk'
+      'too-many': 'Højst 5 skærmbilleder pr. indmelding.', remove: 'Fjern billede', close: 'Luk',
+      releases: 'Versioner', fixed: 'Fejl rettet', 'fixed-in': 'i {n} versioner', 'fixed-in-1': 'i 1 version', 'fixed-in-0': 'Ingen versioner endnu',
+      'fixed-hint': 'Fejl med status Løst. Tryk for at se versionerne.',
+      release: 'Version', 'no-release': 'Ingen version', 'new-release': 'Ny version', 'rel-version-ph': 'fx 1.9.9', 'rel-date': 'Dato',
+      'rel-add': 'Opret version', 'rel-bad': 'Skriv et versionsnummer som 1.9.9.', 'rel-exists': 'Den version findes allerede.', 'rel-made': 'Version {v} er oprettet.',
+      'empty-releases': 'Ingen versioner endnu', 'empty-releases-sub': 'Når en indmelding er løst i en version, står den her.',
+      'rel-bugs': '{n} fejl', 'rel-feedbacks': '{n} feedback', 'rel-ideas': '{n} idéer', 'rel-idea-1': '1 idé', 'rel-empty': 'Ingen indmeldinger knyttet til versionen endnu.',
+      unreleased: 'Løst uden version', 'unreleased-sub': 'Løste indmeldinger, der ikke er knyttet til en version. Åbn en for at vælge versionen.',
+      'manage-v': 'Status, version og svar'
     },
     en: {
       kicker: 'Vicuras · TeamLead', h1: 'Bugs, feedback and ideas',
@@ -460,7 +483,15 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       reply: 'Reply', 'reply-ph': 'Reply to the TeamLead (optional)', save: 'Save', saved: 'Saved', manage: 'Status and reply',
       delete: 'Delete', 'confirm-delete': 'Delete "{t}"? This can’t be undone.', 'err-author': 'Couldn’t save. Reported by must be someone with access to the page.',
       'shots-loading': 'Loading screenshots …', 'shot-missing': 'The screenshot couldn’t be loaded.',
-      'too-many': 'At most 5 screenshots per report.', remove: 'Remove image', close: 'Close'
+      'too-many': 'At most 5 screenshots per report.', remove: 'Remove image', close: 'Close',
+      releases: 'Releases', fixed: 'Bugs fixed', 'fixed-in': 'in {n} releases', 'fixed-in-1': 'in 1 release', 'fixed-in-0': 'No releases yet',
+      'fixed-hint': 'Bugs marked Solved. Press to see the releases.',
+      release: 'Release', 'no-release': 'No release', 'new-release': 'New release', 'rel-version-ph': 'e.g. 1.9.9', 'rel-date': 'Date',
+      'rel-add': 'Create release', 'rel-bad': 'Enter a version number like 1.9.9.', 'rel-exists': 'That release already exists.', 'rel-made': 'Release {v} has been created.',
+      'empty-releases': 'No releases yet', 'empty-releases-sub': 'When a report is solved in a release, it shows up here.',
+      'rel-bugs': '{n} bugs', 'rel-bug-1': '1 bug', 'rel-feedbacks': '{n} feedback', 'rel-ideas': '{n} ideas', 'rel-idea-1': '1 idea', 'rel-empty': 'No reports linked to this release yet.',
+      unreleased: 'Solved without a release', 'unreleased-sub': 'Solved reports that aren’t linked to a release. Open one to pick its release.',
+      'manage-v': 'Status, release and reply'
     }
   };
   const ICON = {
@@ -473,6 +504,15 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     reply: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v4"/></svg>'
   };
   const STATUSES = ['new', 'progress', 'done', 'declined'];
+  const VERSION = /^\d+(\.\d+){1,3}$/;
+  // "1.10.0" after "1.9.9": compared part by part as numbers.
+  const byVersionDesc = (a, b) => {
+    const x = a.split('.').map(Number), y = b.split('.').map(Number);
+    for (let i = 0; i < Math.max(x.length, y.length); i++) { const d = (y[i] || 0) - (x[i] || 0); if (d) return d; }
+    return 0;
+  };
+  function releaseList() { return Object.values(S.releases).sort((a, b) => byVersionDesc(a.version, b.version)); }
+  function fmtDay(ymd) { return ymd ? fmtDate(ymd + 'T12:00:00', false) + ' ' + ymd.slice(0, 4) : ''; }
   const MAX_SHOTS = 5, SHOT_LIMIT = 230000; // characters of data URL per screenshot document (must stay under the limit in firestore.rules)
   const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const $ = id => document.getElementById(id);
@@ -484,6 +524,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     type: null, area: null, shots: [], confirmNoShot: false, busy: false,
     db: null, auth: null, uid: null, admin: false, myEmail: null, myName: '',
     pub: {}, mine: {}, unsub: [],   // report id -> report, from the queries this person may read
+    releases: {},                   // version -> { version, date, notes }
     tab: null, drawer: null, notice: null,
     f: { type: '', area: '', status: '', q: '' }
   };
@@ -707,7 +748,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
   function inTab(list) {
     if (S.tab === 'mine') return list.filter(isMine);
     if (S.tab === 'others') return list.filter(i => !isMine(i) && !i.private);
-    return list;
+    return list; // 'all', and 'releases', which shows everything this person may read
   }
   function applyFilters(list, forTiles) {
     const q = lc(S.f.q.trim());
@@ -772,6 +813,62 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       b.addEventListener('click', () => { S.f.type = S.f.type === v ? '' : v; render(); });
       box.append(b);
     });
+    // Bugs fixed, in all: the bugs marked Solved, and how many releases they went out in.
+    const fixed = pool.filter(i => i.type === 'bug' && i.status === 'done');
+    const rels = new Set(fixed.map(i => i.release).filter(Boolean)).size;
+    const f = el('button', 'stat fixed'); f.type = 'button'; f.id = 'stat-fixed'; f.title = t('fixed-hint');
+    f.setAttribute('aria-pressed', S.tab === 'releases');
+    const ft = el('span', 'stat-top');
+    const fd = el('span', 'dot bug'); fd.innerHTML = ICON.check; fd.style.background = 'var(--idea-soft)'; fd.querySelector('svg').style.stroke = 'var(--ok)';
+    const fx = el('span'); fx.append(el('div', 'n', String(fixed.length)), el('div', 'l', t('fixed')));
+    ft.append(fd, fx);
+    const fp = el('span', 'prog');
+    fp.append(el('span', 'prog-l' + (rels ? ' some' : ''), rels === 0 ? t('fixed-in-0') : rels === 1 ? t('fixed-in-1') : t('fixed-in').replace('{n}', rels)));
+    f.append(ft, fp);
+    f.addEventListener('click', () => { S.tab = S.tab === 'releases' ? (S.admin ? 'all' : 'mine') : 'releases'; render(); });
+    box.append(f);
+  }
+
+  // The Releases tab: each release, newest first, with what was solved in it. Editors also see the solved reports with no release yet.
+  function renderReleases(list, box) {
+    const wrap = el('div', 'rels');
+    const counts = items => {
+      const c = el('span', 'rel-counts');
+      const n = k => items.filter(i => i.type === k).length;
+      const b = n('bug'), fb = n('feedback'), id = n('idea');
+      if (b) c.append(el('span', 'chip', b === 1 && t('rel-bug-1') ? t('rel-bug-1') : t('rel-bugs').replace('{n}', b)));
+      if (fb) c.append(el('span', 'chip', t('rel-feedbacks').replace('{n}', fb)));
+      if (id) c.append(el('span', 'chip', id === 1 ? t('rel-idea-1') : t('rel-ideas').replace('{n}', id)));
+      return c;
+    };
+    const order = it => ({ bug: 0, feedback: 1, idea: 2 }[it.type] ?? 3);
+    releaseList().forEach(r => {
+      const items = list.filter(i => i.release === r.version).sort((a, b) => order(a) - order(b) || (b.createdAt || '').localeCompare(a.createdAt || ''));
+      const sec = el('section', 'rel'); sec.id = 'rel-' + r.version;
+      const head = el('div', 'rel-head');
+      head.append(el('span', 'rel-v', r.version), el('span', 'rel-date', fmtDay(r.date)), counts(items));
+      sec.append(head);
+      if (r.notes) sec.append(el('p', 'rel-notes', r.notes));
+      if (items.length) { const g = el('div', 'grid'); items.forEach(i => g.append(card(i, false))); sec.append(g); }
+      else sec.append(el('p', 'rel-notes', t('rel-empty')));
+      wrap.append(sec);
+    });
+    if (S.admin) {
+      const loose = list.filter(i => i.status === 'done' && !i.release);
+      if (loose.length) {
+        const sec = el('section', 'rel unrel');
+        const head = el('div', 'rel-head'); head.append(el('span', 'rel-v', t('unreleased')), counts(loose));
+        sec.append(head, el('p', 'rel-notes', t('unreleased-sub')));
+        const g = el('div', 'grid'); loose.forEach(i => g.append(card(i, false))); sec.append(g);
+        wrap.append(sec);
+      }
+    }
+    if (!wrap.children.length) {
+      const g = el('div', 'grid'); const e = el('div', 'empty');
+      e.append(el('b', null, t('empty-releases')), el('span', null, t('empty-releases-sub')));
+      g.append(e); box.append(g); return;
+    }
+    box.append(wrap);
   }
 
   function render() {
@@ -779,8 +876,8 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     const all = allItems();
     // tabs
     const tabs = $('tabs'); tabs.textContent = '';
-    (S.admin ? ['all', 'mine'] : ['mine', 'others']).forEach(k => {
-      const prev = S.tab; S.tab = k; const n = inTab(all).length; S.tab = prev;
+    (S.admin ? ['all', 'mine', 'releases'] : ['mine', 'others', 'releases']).forEach(k => {
+      const prev = S.tab; S.tab = k; const n = k === 'releases' ? releaseList().length : inTab(all).length; S.tab = prev;
       const b = el('button', 'tab'); b.type = 'button'; b.id = 'tab-' + k; b.setAttribute('aria-pressed', S.tab === k);
       b.append(t(k), el('span', 'n', String(n)));
       b.addEventListener('click', () => { S.tab = k; render(); });
@@ -789,8 +886,12 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     $('admin-note').hidden = !S.admin;
     const base = inTab(all);
     renderStats(base);
+    const releasesTab = S.tab === 'releases';
+    $('f-status').hidden = S.view === 'board' || releasesTab;
+    document.querySelector('.views').hidden = releasesTab;
     const list = applyFilters(base);
     const box = $('list'); box.textContent = '';
+    if (releasesTab) { renderReleases(applyFilters(base, true), box); return; }
 
     if (!list.length) {
       const g = el('div', 'grid'); const e = el('div', 'empty');
@@ -826,6 +927,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     if (it.text) c.append(el('p', 'excerpt', it.text));
     const foot = el('div', 'card-foot');
     foot.append(el('span', 'chip', it.area === 'app' ? t('app') : 'D365'));
+    if (it.release) foot.append(el('span', 'chip ver', 'v' + it.release));
     if (it.private) foot.append(el('span', 'chip lock', '🔒 ' + t('only-louise')));
     if (it.shots && it.shots.length) { const s = el('span', 'ico'); s.innerHTML = ICON.img; s.append(String(it.shots.length)); foot.append(s); }
     if (it.reply) { const r = el('span', 'ico'); r.innerHTML = ICON.reply; foot.append(r); }
@@ -850,6 +952,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     const meta = el('div', 'd-meta');
     const st = it.status || 'new';
     meta.append(el('span', 'status ' + st, t('status')[st]), el('span', 'chip', it.area === 'app' ? t('app') : 'D365'));
+    if (it.release) meta.append(el('span', 'chip ver', t('release') + ' ' + it.release));
     if (it.private) meta.append(el('span', 'chip lock', '🔒 ' + t('only-louise')));
     meta.append(el('span', 'who', t('reported-by') + ' ' + authorName(it)), el('span', null, fmtDate(it.createdAt, true)));
     hb.append(meta); head.append(dot, hb); box.append(head);
@@ -886,7 +989,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
 
   function renderAdmin(it) {
     const box = el('div', 'adm');
-    box.append(el('h3', null, t('manage')));
+    box.append(el('h3', null, t('manage-v')));
     let status = it.status || 'new';
     const pick = el('div', 'status-pick'); pick.setAttribute('role', 'group');
     STATUSES.forEach(s => {
@@ -900,6 +1003,33 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     const al = el('label', 'label', t('q-author')); al.htmlFor = 'au-' + it.id;
     const au = el('input'); au.type = 'text'; au.id = 'au-' + it.id; au.inputMode = 'email'; au.autocomplete = 'off';
     au.value = it.authorEmail || ''; au.placeholder = 'navn@' + allowedDomain;
+    // The release it was solved in, from the releases editors have made, or a new one made here.
+    const vl = el('label', 'label', t('release')); vl.htmlFor = 'rl-' + it.id;
+    const vs = el('select'); vs.id = 'rl-' + it.id;
+    const fillReleases = cur => {
+      vs.textContent = '';
+      [['', t('no-release')], ...releaseList().map(r => [r.version, r.version + (r.date ? ' · ' + fmtDay(r.date) : '')])].forEach(([v, l]) => {
+        const o = el('option', null, l); o.value = v; if (v === cur) o.selected = true; vs.append(o);
+      });
+    };
+    fillReleases(it.release || '');
+    const add = el('div', 'rel-add');
+    const nv = el('input'); nv.type = 'text'; nv.inputMode = 'decimal'; nv.placeholder = t('rel-version-ph'); nv.setAttribute('aria-label', t('new-release'));
+    const nd = el('input'); nd.type = 'date'; nd.value = new Date().toISOString().slice(0, 10); nd.setAttribute('aria-label', t('rel-date'));
+    const nb = el('button', 'btn', t('rel-add')); nb.type = 'button';
+    nb.addEventListener('click', async () => {
+      const v = nv.value.trim();
+      if (!VERSION.test(v)) { nv.focus(); note.textContent = t('rel-bad'); return; }
+      if (S.releases[v]) { vs.value = v; note.textContent = t('rel-exists'); return; }
+      nb.disabled = true; note.textContent = '';
+      try {
+        await setDoc(doc(S.db, 'releases', v), { version: v, date: nd.value || '', notes: '', createdAt: serverTimestamp() });
+        S.releases[v] = { version: v, date: nd.value || '', notes: '' };
+        fillReleases(v); nv.value = ''; note.textContent = t('rel-made').replace('{v}', v);
+      } catch (e) { note.textContent = saveError(e); }
+      nb.disabled = false;
+    });
+    add.append(nv, nd, nb);
     const row = el('div', 'adm-row');
     const save = el('button', 'btn solid', t('save')); save.type = 'button';
     const del = el('button', 'btn danger', t('delete')); del.type = 'button';
@@ -909,7 +1039,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       if (!EMAIL.test(email)) { au.focus(); note.textContent = t('bad-author'); return; }
       save.disabled = true; note.textContent = '';
       try {
-        const change = { status, reply: ta.value.trim(), repliedAt: serverTimestamp() };
+        const change = { status, reply: ta.value.trim(), repliedAt: serverTimestamp(), release: vs.value };
         if (email !== lc(it.authorEmail)) Object.assign(change, { authorEmail: email, authorName: await nameFor(email) });
         await updateDoc(doc(S.db, 'reports', it.id), change);
         note.textContent = t('saved');
@@ -928,7 +1058,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
       } catch (e) { note.textContent = saveError(e); del.disabled = false; }
     });
     row.append(save, note, el('span', 'sep'), del);
-    box.append(pick, rl, ta, al, au, row);
+    box.append(pick, vl, vs, add, rl, ta, al, au, row);
     return box;
   }
 
@@ -1016,7 +1146,7 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
   }
   function stopListening() {
     S.unsub.forEach(u => u()); S.unsub = [];
-    for (const m of [S.pub, S.mine]) for (const k of Object.keys(m)) delete m[k];
+    for (const m of [S.pub, S.mine, S.releases]) for (const k of Object.keys(m)) delete m[k];
   }
 
   async function onUser(u) {
@@ -1043,6 +1173,12 @@ import { firebaseConfig, allowedDomain } from './firebase-config.js';
     S.tab = S.admin ? 'all' : 'mine';
     $('author-field').hidden = !S.admin;
     const fail = err => { console.error(err); showNotice(err && err.code === 'permission-denied' ? 'err-noaccess' : 'err-load'); };
+    // The releases are read on their own: without them the reports still show, just without the Releases tab's headings.
+    S.unsub.push(onSnapshot(collection(S.db, 'releases'), s => {
+      for (const k of Object.keys(S.releases)) delete S.releases[k];
+      s.docs.forEach(d => { const v = d.data(); S.releases[d.id] = { version: d.id, date: v.date || '', notes: v.notes || '' }; });
+      onData();
+    }, err => console.error(err)));
     if (S.admin) {
       S.unsub.push(onSnapshot(reports, s => { intoMap(S.pub, s); onData(); }, fail));
     } else {
