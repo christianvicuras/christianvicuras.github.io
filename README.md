@@ -1,4 +1,14 @@
-# TeamLead Indmeldinger
+# TeamLead Indmeldinger (moved to Puls)
+
+The TeamLead page closed on 17 November 2026. Its reports are support tickets in Puls now, at https://puls.vicuras.dk:
+each in its author's name under Support › Mine sager, registered on Behandler-app or Dynamics 365 (Puls README,
+"TeamLead-indmeldinger"). `https://christianvicuras.github.io/` shows one page that says so, in Danish and English, and
+links to Puls ([index.html](index.html), no Firebase). Firestore (`vicuras-teamlead`) is left as it was.
+
+The old app is in the git history (last version: commit `732710e`), and the notes below describe it.
+
+---
+
 
 Bug reports, feedback and ideas from TeamLeads, at `https://christianvicuras.github.io/`.
 

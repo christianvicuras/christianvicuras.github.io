@@ -1,1204 +1,498 @@
-<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>TeamLead Indmeldinger</title>
-<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<meta name="theme-color" content="#232049">
+<title>Flyttet til Puls · Vicuras</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23772E4B'/%3E%3Cpath d='M3 18h7l2-4 3 9 3-14 3 9h8' fill='none' stroke='%23FCFAF1' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
-/* Layout: full-width work surface. Berry header band with the big "Meld noget ind" action; a toolbar (tabs, search, filters, view);
-   reports as a card grid or a status board; the form and the details open in a panel from the right. Vicuras brand guide 2026. */
+/* The TeamLead page has closed: its reports are support tickets in Puls now (puls.vicuras.dk). One screen in Puls'
+   own colours (midnight, plum, pink, cream), with the reports flying across into Puls and its heartbeat. */
 :root {
-  --bg: #FBF7EE;          /* Eggshell, a shade deeper so white cards lift */
-  --surface: #FFFFFF;
-  --fg: #1C1B1B;          /* Shadow */
-  --muted: #6B5C63;
-  --line: #E8DDE2;
-  --accent: #772E4B;      /* Berry */
-  --accent-fg: #FFFBF1;
-  --soft: #F3E6EE;
-  --rose: #DAB5CF;
-  --band: #772E4B; --band-fg: #FFFBF1; --band-kicker: #DAB5CF;
-  --bug: #A3392F; --bug-soft: #F8E3DF;
-  --fb: #232049;  --fb-soft: #E4E3F0;    /* Midnight */
-  --idea: #0E5642; --idea-soft: #DCEBE4; /* Forest */
-  --ok: #0E5642; --warn: #8A5A00; --warn-soft: #FBEFD5;
-  --scrim: rgba(28, 20, 24, .45);
-  --shadow: 0 1px 2px rgba(60, 20, 40, .06), 0 6px 20px rgba(60, 20, 40, .06);
-  --font: "Manrope", "Lato", system-ui, sans-serif;
-  --r-frame: 24px; --r-card: 16px; --r-el: 12px;
+  --ink: #232049;
+  --ink-2: #2d2958;
+  --plum: #772E4B;
+  --pink: #DAB5CF;
+  --cream: #FCFAF1;
+  --sage: #E0E5DD;
+  --green: #0E5642;
+  --muted: rgba(252, 250, 241, .68);
+  --line: rgba(252, 250, 241, .12);
+  --ease: cubic-bezier(.2, .7, .2, 1);
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #17161A; --surface: #221F25; --fg: #FFFBF1; --muted: #B8A9B1; --line: #3A3239;
-  --accent: #DAB5CF; --accent-fg: #2A1520; --soft: #3A2632; --rose: #DAB5CF;
-  --band: #4E1E31; --band-fg: #FFFBF1; --band-kicker: #DAB5CF;
-  --bug: #F0A49A; --bug-soft: #45231F; --fb: #BDB9F0; --fb-soft: #2A2847; --idea: #8FD3B6; --idea-soft: #183A30;
-  --ok: #8FD3B6; --warn: #F2C46B; --warn-soft: #3D2F12; --scrim: rgba(0, 0, 0, .6); --shadow: 0 1px 2px rgba(0,0,0,.3); color-scheme: dark; } }
-:root[data-theme="dark"] {
-  --bg: #17161A; --surface: #221F25; --fg: #FFFBF1; --muted: #B8A9B1; --line: #3A3239;
-  --accent: #DAB5CF; --accent-fg: #2A1520; --soft: #3A2632; --rose: #DAB5CF;
-  --band: #4E1E31; --band-fg: #FFFBF1; --band-kicker: #DAB5CF;
-  --bug: #F0A49A; --bug-soft: #45231F; --fb: #BDB9F0; --fb-soft: #2A2847; --idea: #8FD3B6; --idea-soft: #183A30;
-  --ok: #8FD3B6; --warn: #F2C46B; --warn-soft: #3D2F12; --scrim: rgba(0, 0, 0, .6); --shadow: 0 1px 2px rgba(0,0,0,.3); color-scheme: dark; }
-
 * { box-sizing: border-box; }
-body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.5; }
-body.locked { overflow: hidden; }
-button, input, textarea, select { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--rose); outline-offset: 2px; }
-.page { max-width: 1480px; margin: 0 auto; padding-inline: clamp(16px, 3vw, 40px); }
+html { -webkit-text-size-adjust: 100%; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: "Manrope", system-ui, sans-serif;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+a { color: inherit; }
 
-/* header band */
-.band { background: var(--band); color: var(--band-fg); }
-.band-in { padding-block: 26px 30px; display: flex; flex-wrap: wrap; gap: 18px 32px; align-items: center; justify-content: space-between; }
-.kicker { color: var(--band-kicker); font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-h1 { margin: 2px 0 0; font-size: clamp(26px, 3.4vw, 38px); font-weight: 800; letter-spacing: -.015em; text-wrap: balance; }
-.lead { margin: 6px 0 0; color: var(--band-kicker); max-width: 60ch; }
-.band-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
-.lang { display: inline-flex; border: 1.5px solid var(--band-kicker); border-radius: 999px; overflow: hidden; }
-.lang button { background: none; border: 0; color: var(--band-fg); padding: 6px 14px; font-weight: 700; font-size: 13px; cursor: pointer; letter-spacing: .06em; }
-.lang button[aria-pressed="true"] { background: var(--band-kicker); color: #4E1E31; }
-.cta { border: 0; border-radius: 999px; background: var(--band-fg); color: #772E4B; font-weight: 800; padding: 13px 22px; font-size: 16px; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; box-shadow: 0 4px 14px rgba(0,0,0,.18); }
-.cta svg { width: 18px; height: 18px; stroke: currentColor; }
-.cta:hover { transform: translateY(-1px); }
-.me { display: inline-flex; gap: 10px; align-items: center; font-size: 13.5px; font-weight: 600; color: var(--band-kicker); }
-.me b { color: var(--band-fg); }
-.auth { max-width: 440px; margin: 8px auto 56px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-frame); padding: 26px 24px; display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow); }
-.auth h2 { margin: 0; font-size: 22px; font-weight: 800; }
-.auth .sub { margin: -8px 0 0; font-size: 14px; }
-.auth input { width: 100%; border: 1.5px solid var(--line); border-radius: var(--r-el); background: var(--surface); padding: 9px 12px; }
-.auth-links { display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: space-between; }
-.linkish { border: 0; background: none; padding: 2px 0; color: var(--accent); font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-.signout { background: none; border: 1.5px solid var(--band-kicker); color: var(--band-fg); border-radius: 999px; padding: 5px 12px; font-weight: 700; font-size: 13px; cursor: pointer; }
+/* Slow drifting light behind everything. */
+.aurora { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.aurora i {
+  position: absolute; border-radius: 50%; filter: blur(70px); opacity: .55;
+  animation: drift 22s ease-in-out infinite alternate;
+}
+.aurora i:nth-child(1) { width: 52vmax; height: 52vmax; left: -18vmax; top: -20vmax; background: var(--plum); }
+.aurora i:nth-child(2) { width: 40vmax; height: 40vmax; right: -14vmax; top: 20vh; background: #4a2d6b; animation-duration: 28s; animation-delay: -6s; }
+.aurora i:nth-child(3) { width: 34vmax; height: 34vmax; left: 24vw; bottom: -22vmax; background: #6b3a5c; opacity: .4; animation-duration: 25s; animation-delay: -12s; }
+@keyframes drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(6vw, 5vh, 0) scale(1.12); }
+}
+.grain {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
-/* summary strip */
-.stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: -18px; }
-@media (max-width: 1000px) { .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-/* Releases: one block per version, newest first, with the reports solved in it. */
-.stat.fixed .n { color: var(--ok); }
-.chip.ver { color: var(--accent); border-color: var(--rose); text-transform: none; letter-spacing: 0; }
-.rels { display: flex; flex-direction: column; gap: 18px; padding-bottom: 56px; }
-.rel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px 18px 18px; box-shadow: var(--shadow); }
-.rel-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin-bottom: 4px; }
-.rel-v { font-size: 22px; font-weight: 800; color: var(--fg); }
-.rel-date { color: var(--muted); font-size: 13.5px; }
-.rel-counts { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
-.rel-notes { margin: 6px 0 0; color: var(--muted); white-space: pre-wrap; font-size: 14px; max-width: 70ch; }
-.rel .grid { padding: 14px 0 0; }
-.rel.unrel { background: transparent; box-shadow: none; border-style: dashed; }
-.rel-add { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; align-items: center; margin-top: 8px; }
-@media (max-width: 520px) { .rel-add { grid-template-columns: 1fr 1fr; } .rel-add .btn { grid-column: 1 / -1; } }
-.stat { all: unset; box-sizing: border-box; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 14px 16px 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); min-width: 0; transition: background .25s, border-color .25s; }
-.stat-top { display: flex; gap: 12px; align-items: center; }
-.prog { display: flex; flex-direction: column; gap: 6px; }
-.bar { display: flex; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
-.bar i { display: block; height: 100%; transition: width .5s ease; }
-.bar .d { background: var(--ok); }
-.prog-l { display: flex; gap: 5px; align-items: center; font-size: 12.5px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.prog-l.some { color: var(--ok); }
-.prog-l svg { width: 14px; height: 14px; stroke: currentColor; flex: none; }
-.stat.complete { background: color-mix(in srgb, var(--idea-soft) 70%, var(--surface)); border-color: color-mix(in srgb, var(--ok) 40%, var(--line)); }
-.stat.complete .prog-l { color: var(--ok); }
-.stat[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent) inset; }
-.stat:focus-visible { outline: 3px solid var(--rose); }
-.stat .n { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
-.stat .l { font-size: 13px; color: var(--muted); font-weight: 600; }
+.page {
+  position: relative; z-index: 1;
+  max-width: 1080px; margin: 0 auto;
+  padding: max(20px, env(safe-area-inset-top)) 16px max(32px, env(safe-area-inset-bottom));
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column;
+}
 
-/* toolbar */
-.toolbar { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; justify-content: space-between; padding-block: 22px 14px; }
-.tb-left, .tb-right { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; min-width: 0; }
-.tabs:empty { display: none; }
-.tabs { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
-.tab { border: 0; background: none; border-radius: 999px; padding: 6px 14px; font-weight: 700; cursor: pointer; font-size: 14px; }
-.tab[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
-.tab .n { font-variant-numeric: tabular-nums; opacity: .7; margin-left: 5px; }
-.search { position: relative; }
-.search input[type="search"] { width: min(320px, 70vw); padding-left: 36px; }
-.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--muted); }
-.views { display: inline-flex; border: 1px solid var(--line); border-radius: var(--r-el); overflow: hidden; background: var(--surface); }
-.views button { border: 0; background: none; padding: 7px 12px; cursor: pointer; font-weight: 700; font-size: 13.5px; display: inline-flex; gap: 6px; align-items: center; }
-.views button svg { width: 16px; height: 16px; stroke: currentColor; }
-.views button[aria-pressed="true"] { background: var(--soft); color: var(--accent); }
-select.compact { width: auto; padding: 7px 10px; font-size: 13.5px; }
-.admin-note { margin: 0 0 14px; font-size: 13.5px; padding: 10px 14px; border-radius: var(--r-el); background: var(--fb-soft); color: var(--fb); font-weight: 600; }
+/* Top bar: Vicuras | Puls, and the language switch. */
+header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 0 0; }
+.brand { display: flex; align-items: center; gap: 12px; color: var(--cream); text-decoration: none; }
+.brand svg { height: 22px; width: auto; display: block; }
+.brand .app { font-size: 18px; font-weight: 600; line-height: 1; color: var(--pink); padding-left: 12px; border-left: 1.5px solid rgba(218, 181, 207, .4); }
+.lang { display: flex; background: rgba(252, 250, 241, .07); border-radius: 999px; padding: 3px; box-shadow: inset 0 0 0 1px var(--line); }
+.lang button {
+  border: 0; background: transparent; color: var(--muted); font: 700 12px/1 "Manrope", sans-serif; letter-spacing: .06em;
+  padding: 7px 11px; border-radius: 999px; cursor: pointer; transition: background .25s, color .25s;
+}
+.lang button[aria-pressed="true"] { background: var(--cream); color: var(--ink); }
 
-input[type="text"], input[type="search"], textarea, select { width: 100%; border: 1.5px solid var(--line); border-radius: var(--r-el); background: var(--surface); padding: 9px 12px; }
-input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; }
+main { flex: 1; display: grid; grid-template-columns: 1.05fr 1fr; gap: 40px; align-items: center; padding: 40px 0 24px; }
 
-/* grid of cards */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 14px; padding-bottom: 56px; }
-.card { all: unset; box-sizing: border-box; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow); min-width: 0; transition: border-color .15s, transform .15s; }
-.card:hover { border-color: var(--rose); transform: translateY(-1px); }
-.card:focus-visible { outline: 3px solid var(--rose); }
-.card-top { display: flex; gap: 10px; align-items: flex-start; }
-.dot { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; flex: none; }
-.dot svg { width: 19px; height: 19px; }
-.dot.bug { background: var(--bug-soft); } .dot.bug svg { stroke: var(--bug); }
-.dot.feedback { background: var(--fb-soft); } .dot.feedback svg { stroke: var(--fb); }
-.dot.idea { background: var(--idea-soft); } .dot.idea svg { stroke: var(--idea); }
-.card .title { font-weight: 800; font-size: 15.5px; line-height: 1.35; overflow-wrap: anywhere; flex: 1; min-width: 0; }
-.card .excerpt { margin: 0; color: var(--muted); font-size: 14px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
-.card-foot { margin-top: auto; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; color: var(--muted); }
-.card-foot .sep { flex: 1; }
-.ico { display: inline-flex; align-items: center; gap: 3px; }
-.ico svg { width: 14px; height: 14px; stroke: currentColor; }
-.chip { font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; border-radius: 6px; padding: 1px 7px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
-.chip.lock { border-color: var(--accent); color: var(--accent); }
-.status { font-size: 12px; font-weight: 800; border-radius: 999px; padding: 3px 10px; white-space: nowrap; flex: none; }
-.status.new { background: var(--soft); color: var(--accent); }
-.status.progress { background: var(--warn-soft); color: var(--warn); }
-.status.done { background: var(--idea-soft); color: var(--ok); }
-.status.declined { background: var(--line); color: var(--muted); }
+/* Left: the message. */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--pink);
+  background: rgba(218, 181, 207, .1); padding: 6px 12px 6px 10px; border-radius: 999px; box-shadow: inset 0 0 0 1px rgba(218, 181, 207, .25);
+}
+.eyebrow .dot { width: 8px; height: 8px; border-radius: 50%; background: #7fd6a8; box-shadow: 0 0 0 0 rgba(127, 214, 168, .6); animation: ping 2s infinite; }
+@keyframes ping { 70% { box-shadow: 0 0 0 9px rgba(127, 214, 168, 0); } 100% { box-shadow: 0 0 0 0 rgba(127, 214, 168, 0); } }
 
-/* board */
-.board-wrap { overflow-x: auto; padding-bottom: 56px; }
-.board { display: grid; grid-template-columns: repeat(4, minmax(260px, 1fr)); gap: 14px; min-width: 1100px; }
-.col { background: color-mix(in srgb, var(--line) 35%, transparent); border-radius: var(--r-card); padding: 10px; display: flex; flex-direction: column; gap: 10px; min-height: 200px; }
-.col h3 { margin: 4px 6px 2px; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; display: flex; justify-content: space-between; color: var(--muted); }
-.col .card { padding: 12px 14px; gap: 8px; }
-.col .card .excerpt { -webkit-line-clamp: 2; }
+h1 {
+  margin: 18px 0 16px;
+  font-size: clamp(2.3rem, 5.4vw, 4.1rem);
+  line-height: 1.04; letter-spacing: -.025em; font-weight: 800;
+  text-wrap: balance;
+}
+h1 .w { display: inline-block; opacity: 0; transform: translateY(.45em) rotate(2deg); filter: blur(6px); animation: rise .9s var(--ease) forwards; }
+h1 .accent { background: linear-gradient(100deg, var(--pink), #f3d9ea 45%, var(--pink) 90%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: rise .9s var(--ease) forwards, sheen 6s linear 2s infinite; }
+@keyframes rise { to { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes sheen { to { background-position: -200% 0; } }
 
-.empty { grid-column: 1 / -1; text-align: center; padding: 56px 16px; color: var(--muted); border: 1.5px dashed var(--line); border-radius: var(--r-frame); display: flex; flex-direction: column; gap: 6px; align-items: center; }
-.empty b { color: var(--fg); font-size: 17px; }
-.empty .btn { margin-top: 10px; }
+.lead { font-size: clamp(1rem, 1.6vw, 1.15rem); color: var(--muted); max-width: 46ch; margin: 0 0 28px; }
+.reveal { opacity: 0; transform: translateY(14px); animation: rise .9s var(--ease) forwards; }
 
-/* drawer */
-.scrim { position: fixed; inset: 0; background: var(--scrim); z-index: 20; }
-.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(620px, 100%); background: var(--bg); z-index: 21; display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(0,0,0,.18); }
-.drawer-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: calc(env(safe-area-inset-top, 0px) + 18px) 24px 14px; border-bottom: 1px solid var(--line); background: var(--surface); }
-.drawer-head h2 { margin: 0; font-size: 20px; font-weight: 800; }
-.x { border: 0; background: var(--soft); color: var(--accent); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 20px; line-height: 1; flex: none; }
-.drawer-body { overflow-y: auto; padding: 22px 24px calc(env(safe-area-inset-bottom, 0px) + 28px); display: flex; flex-direction: column; gap: 20px; }
-@media (prefers-reduced-motion: no-preference) { .drawer { animation: slide .22s ease-out; } @keyframes slide { from { transform: translateX(24px); opacity: .6; } to { transform: none; opacity: 1; } } }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 34px; }
+.btn {
+  position: relative; overflow: hidden;
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 15px 22px; border-radius: 16px; text-decoration: none;
+  font-weight: 800; font-size: 15px; letter-spacing: .01em;
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s;
+}
+.btn svg { width: 18px; height: 18px; transition: transform .3s var(--ease); }
+.btn:hover svg, .btn:focus-visible svg { transform: translateX(4px); }
+.btn.primary { background: var(--pink); color: var(--ink); box-shadow: 0 10px 30px -10px rgba(218, 181, 207, .65); }
+.btn.primary::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-120%);
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .55) 50%, transparent 70%);
+  animation: shine 4.5s ease-in-out 2.4s infinite;
+}
+@keyframes shine { 0%, 60% { transform: translateX(-120%); } 85%, 100% { transform: translateX(120%); } }
+.btn.primary:hover { transform: translateY(-2px); box-shadow: 0 16px 36px -12px rgba(218, 181, 207, .8); }
+.btn.ghost { color: var(--cream); box-shadow: inset 0 0 0 1.5px rgba(252, 250, 241, .28); }
+.btn.ghost:hover { background: rgba(252, 250, 241, .07); transform: translateY(-2px); }
+.btn:focus-visible, .lang button:focus-visible { outline: 2px solid var(--pink); outline-offset: 3px; }
 
-.field { display: flex; flex-direction: column; gap: 8px; border: 0; margin: 0; padding: 0; min-width: 0; }
-.label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0; }
-.sub { font-size: 13px; color: var(--muted); }
-.types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.type { border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r-el); padding: 14px 6px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font-weight: 700; }
-.type svg { width: 28px; height: 28px; }
-.type[data-v="bug"] { --c: var(--bug); --cs: var(--bug-soft); }
-.type[data-v="feedback"] { --c: var(--fb); --cs: var(--fb-soft); }
-.type[data-v="idea"] { --c: var(--idea); --cs: var(--idea-soft); }
-.type svg { stroke: var(--c); }
-.type[aria-pressed="true"] { border-color: var(--c); background: var(--cs); color: var(--c); }
-.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.seg button { border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r-el); padding: 10px; font-weight: 700; cursor: pointer; }
-.seg button small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); }
-.seg button[aria-pressed="true"] { border-color: var(--accent); background: var(--soft); color: var(--accent); }
-textarea { min-height: 130px; resize: vertical; }
-.drop { border: 1.5px dashed var(--line); border-radius: var(--r-el); padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); }
-.drop.over { border-color: var(--accent); background: var(--soft); }
-.drop.nudge { border-color: var(--bug); background: var(--bug-soft); }
-.drop-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
-.drop p { margin: 0; font-size: 13.5px; color: var(--muted); }
-.drop.nudge p.hint { color: var(--bug); font-weight: 700; }
-.btn { border: 1.5px solid var(--accent); color: var(--accent); background: none; border-radius: 999px; padding: 7px 16px; font-weight: 700; cursor: pointer; font-size: 14px; }
-.btn.solid { background: var(--accent); color: var(--accent-fg); }
-.kbd { font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 6px; padding: 0 5px; background: var(--bg); }
-.thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
-.thumb { position: relative; width: 96px; height: 72px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
-.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.thumb button { position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: rgba(28,27,27,.75); color: #fff; cursor: pointer; line-height: 22px; padding: 0; font-size: 14px; }
-.private { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: var(--r-el); background: var(--soft); cursor: pointer; }
-.private input { width: 20px; height: 20px; accent-color: var(--accent); margin: 2px 0 0; flex: none; }
-.private b { display: block; }
-.private span { font-size: 13px; color: var(--muted); }
-.submit { border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-fg); font-weight: 800; padding: 14px 20px; font-size: 16px; cursor: pointer; }
-.submit:disabled { opacity: .45; cursor: not-allowed; }
-.msg { margin: 0; font-size: 14px; border-radius: var(--r-el); padding: 10px 12px; }
-.msg.ok { background: var(--idea-soft); color: var(--ok); font-weight: 700; }
-.msg.err { background: var(--bug-soft); color: var(--bug); font-weight: 600; }
-.msg.warn { background: var(--warn-soft); color: var(--warn); }
-.confirm-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 470px; }
+.stat { background: rgba(252, 250, 241, .05); border-radius: 18px; padding: 14px 14px 12px; box-shadow: inset 0 0 0 1px var(--line); }
+.stat b { display: block; font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--muted); }
 
-/* detail */
-.d-head { display: flex; gap: 14px; align-items: flex-start; }
-.d-head .dot { width: 44px; height: 44px; border-radius: 12px; }
-.d-title { margin: 0; font-size: 22px; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; text-wrap: balance; }
-.d-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; color: var(--muted); font-size: 13.5px; margin-top: 6px; }
-.d-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15.5px; line-height: 1.6; max-width: 65ch; }
-.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-.shots a { display: block; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); aspect-ratio: 4 / 3; max-width: 100%; }
-.shots img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.reply { border-left: 3px solid var(--accent); padding: 8px 14px; background: var(--soft); border-radius: 0 12px 12px 0; }
-.reply b { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
-.reply p { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-.adm { display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px; }
-.adm h3 { margin: 0; font-size: 14px; }
-.status-pick { display: flex; flex-wrap: wrap; gap: 6px; }
-.status-pick button { border: 1.5px solid var(--line); background: var(--bg); border-radius: 999px; padding: 5px 12px; font-weight: 700; cursor: pointer; font-size: 13.5px; }
-.status-pick button[aria-pressed="true"] { border-color: var(--accent); background: var(--soft); color: var(--accent); }
-.adm textarea { min-height: 90px; }
-.adm-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.adm-row .sep { flex: 1; }
-.adm input { width: 100%; border: 1.5px solid var(--line); border-radius: var(--r-el); background: var(--bg); padding: 9px 12px; }
-.btn.danger { border-color: var(--bug); color: var(--bug); }
+/* Right: the move, drawn. */
+.scene {
+  position: relative; aspect-ratio: 1 / .92; width: 100%;
+  border-radius: 28px;
+  background: linear-gradient(160deg, rgba(252, 250, 241, .07), rgba(252, 250, 241, .02));
+  box-shadow: inset 0 0 0 1px var(--line), 0 30px 80px -40px rgba(0, 0, 0, .6);
+  overflow: hidden;
+}
+.scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.node {
+  position: absolute; width: 38%;
+  border-radius: 20px; padding: 14px 14px 12px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.node .k { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.node .t { font-size: clamp(14px, 1.7vw, 17px); font-weight: 800; line-height: 1.2; }
+.node .s { font-size: 12px; }
+.from { left: 6%; top: 9%; background: #34305f; box-shadow: inset 0 0 0 1px var(--line), 0 18px 40px -24px rgba(0, 0, 0, .6); color: var(--muted); }
+.from .k { color: rgba(252, 250, 241, .45); }
+.from .t { text-decoration: line-through; text-decoration-color: rgba(218, 181, 207, .55); text-decoration-thickness: 2px; }
+.to { right: 6%; bottom: 9%; background: var(--cream); color: var(--ink); box-shadow: 0 18px 50px -18px rgba(218, 181, 207, .7); transition: transform .35s var(--ease); }
+.to .k { color: var(--plum); }
+.to .s { color: #5a5670; }
+.to.bump { transform: scale(1.045); }
+.to .ecg { height: 26px; width: 100%; margin-top: 2px; }
+.ecg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.ecg .track { stroke: rgba(119, 46, 75, .14); stroke-width: 2.5; }
+.ecg .beat { stroke: var(--plum); stroke-width: 2.5; stroke-dasharray: 22 100; animation: beat 1.8s linear infinite; }
+@keyframes beat { from { stroke-dashoffset: 122; } to { stroke-dashoffset: 0; } }
+.count-chip {
+  position: absolute; right: 12px; top: 12px;
+  background: var(--plum); color: var(--cream); font-size: 12px; font-weight: 800; border-radius: 999px; padding: 3px 9px;
+  font-variant-numeric: tabular-nums;
+}
 
-.viewer { position: fixed; inset: 0; background: rgba(15,12,14,.88); display: grid; place-items: center; padding: 24px; z-index: 40; cursor: zoom-out; }
-.viewer img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+/* How to find them. */
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 8px 0 8px; }
+.step {
+  position: relative; background: rgba(252, 250, 241, .05); border-radius: 22px; padding: 18px 18px 18px 18px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  opacity: 0; transform: translateY(18px); transition: opacity .8s var(--ease), transform .8s var(--ease), background .3s;
+}
+.step.in { opacity: 1; transform: none; }
+.step:hover { background: rgba(252, 250, 241, .08); }
+.step .n {
+  width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center;
+  background: rgba(218, 181, 207, .16); color: var(--pink); font-weight: 800; font-size: 14px; margin-bottom: 12px;
+}
+.step h3 { margin: 0 0 6px; font-size: 16px; font-weight: 800; }
+.step p { margin: 0; font-size: 14px; color: var(--muted); }
+.step em { font-style: normal; color: var(--cream); font-weight: 700; }
+
+footer { padding: 26px 0 0; font-size: 12.5px; color: rgba(252, 250, 241, .5); display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: space-between; }
+
+@media (max-width: 860px) {
+  main { grid-template-columns: 1fr; gap: 28px; padding-top: 28px; }
+  .scene { order: -1; aspect-ratio: 1 / .78; }
+  .steps { grid-template-columns: 1fr; }
+}
+@media (max-width: 420px) {
+  .stats { gap: 8px; }
+  .stat { padding: 12px 10px 10px; }
+  .node { width: 46%; padding: 11px 11px 10px; }
+  .btn { flex: 1 1 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  h1 .w, .reveal, .step { opacity: 1; transform: none; filter: none; }
+}
 </style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="grain" aria-hidden="true"></div>
 
-<header class="band">
-  <div class="page band-in">
-    <div>
-      <div class="kicker" data-t="kicker">Vicuras · TeamLead</div>
-      <h1 data-t="h1">Fejl, feedback og idéer</h1>
-      <p class="lead" data-t="lead">Fortæl os, hvad der driller, og hvad der kan blive bedre i appen og i D365. Det tager et minut.</p>
+<div class="page">
+  <header>
+    <a class="brand" href="https://puls.vicuras.dk/" aria-label="Puls">
+      <svg viewBox="0 0 233.93 48.49" fill="currentColor" role="img" aria-label="Vicuras"><path d="M50.23.04c0,17.79-3.07,23.87-6.96,31.58-.34.67-.68,1.35-1.03,2.06-2.17,4.39-9.32,13.51-17.02,13.51-.34,0-.69-.02-1.03-.06-11.34-1.23-10.24-14.56-9.88-18.94.12-1.51.26-2.94.39-4.31.6-6.45,1.12-12.02-.77-13.32-.57-.4-.9-.36-1.17-.3-1.7.39-3.91,2.98-6.58,7.71-.16.28-.29.51-.4.7L0,15.26c.09-.16.21-.36.34-.6C3.05,9.87,6.46,4.82,11.26,3.72c2.24-.52,4.49-.06,6.48,1.32,5.13,3.54,4.5,10.22,3.64,19.47-.13,1.34-.26,2.76-.38,4.23-.93,11.19,2.1,11.52,3.91,11.72,3.76.41,9.54-6.18,11.32-9.76.36-.72.71-1.42,1.05-2.1,3.62-7.18,6.24-12.37,6.24-28.56h6.71Z"/><path d="M80.61,19.7c1.42-1.04,3.23-1.56,5.44-1.56,1.95,0,3.69.54,5.2,1.62,1.51,1.08,2.6,2.6,3.27,4.55l6.69-1.93c-.86-3.28-2.63-5.87-5.33-7.76-2.69-1.89-5.94-2.83-9.74-2.83-3.52,0-6.53.78-9.04,2.35-2.51,1.57-4.44,3.73-5.79,6.49-1.35,2.76-2.04,5.93-2.06,9.51.02,3.52.69,6.66,2.01,9.43,1.32,2.77,3.22,4.95,5.71,6.53,2.49,1.59,5.51,2.38,9.08,2.38s6.91-.91,9.53-2.72c2.62-1.81,4.49-4.41,5.63-7.81l-6.82-1.61c-.71,1.87-1.73,3.3-3.07,4.3-1.34,1-3.1,1.5-5.26,1.5-3.18,0-5.57-1.1-7.19-3.32-1.62-2.21-2.44-5.11-2.46-8.69.02-2.32.37-4.38,1.06-6.18.69-1.8,1.74-3.22,3.15-4.26h0Z"/><path d="M131.53,30.85c0,2.06-.23,3.81-.69,5.25-.46,1.44-1.09,2.6-1.9,3.48-.8.88-1.74,1.52-2.82,1.91-1.07.4-2.21.6-3.41.6-1.85,0-3.34-.37-4.49-1.13-1.15-.75-2.04-1.74-2.67-2.96-.63-1.22-1.06-2.55-1.29-3.98-.23-1.43-.34-2.82-.34-4.17V12.76h-6.82v19.31c0,1.07.1,2.32.29,3.73.19,1.42.56,2.86,1.09,4.35.54,1.48,1.31,2.85,2.33,4.1,1.02,1.26,2.34,2.27,3.98,3.04,1.63.77,3.65,1.16,6.05,1.16,3.13,0,5.8-.68,8.01-2.03,1.35-.83,2.51-1.86,3.48-3.08v4.17h5.99V12.76h-6.79v18.09h0Z"/><path d="M162.89,12.58c-1.14.08-2.25.29-3.33.64-1.08.35-2.07.85-2.94,1.5-.9.6-1.7,1.37-2.38,2.3-.31.42-.58.85-.84,1.3v-5.57h-5.99v34.76h6.79v-17.54c0-1.37.14-2.68.42-3.91.28-1.23.74-2.35,1.37-3.36.63-1.01,1.5-1.87,2.59-2.57,1.16-.75,2.43-1.19,3.81-1.32,1.38-.13,2.64-.04,3.78.26v-6.31c-1.05-.19-2.15-.25-3.28-.18h0Z"/><path d="M197.39,18.42c-1.07-2.3-2.76-3.98-5.07-5.04-2.31-1.06-5.02-1.59-8.13-1.59-4.01,0-7.23.88-9.64,2.64-2.41,1.76-4.05,4.13-4.91,7.11l6.28,1.93c.6-1.95,1.66-3.35,3.19-4.2,1.52-.85,3.2-1.27,5.02-1.27,2.9,0,4.94.66,6.13,1.98,1.04,1.15,1.61,2.84,1.71,5.06-1.31.18-2.63.37-3.96.55-2.16.3-4.21.62-6.16.97-1.95.34-3.7.74-5.25,1.19-1.78.58-3.28,1.34-4.51,2.27-1.22.93-2.15,2.06-2.77,3.4s-.93,2.88-.93,4.63c0,1.89.45,3.62,1.34,5.2.89,1.58,2.2,2.84,3.94,3.8,1.74.95,3.89,1.43,6.47,1.43,3.24,0,5.97-.65,8.19-1.95,1.66-.97,3.11-2.33,4.33-4.06v5.04h5.95v-21.4c0-1.46-.06-2.82-.19-4.09-.13-1.27-.47-2.47-1.03-3.6h0ZM191.84,32.62c-.05,1.29-.26,2.45-.63,3.48-.26,1.14-.8,2.23-1.64,3.28s-1.94,1.91-3.32,2.59c-1.37.68-3.01,1.01-4.92,1.01-1.44,0-2.62-.23-3.54-.68-.92-.45-1.61-1.06-2.06-1.82-.45-.76-.68-1.59-.68-2.49s.21-1.71.63-2.35.99-1.19,1.71-1.64c.72-.45,1.54-.84,2.46-1.16,1.09-.34,2.34-.64,3.75-.89,1.4-.25,2.98-.5,4.71-.76,1.11-.16,2.32-.34,3.59-.54-.01.57-.04,1.22-.07,1.95h0Z"/><path d="M232.81,32.89c-.74-1.26-1.97-2.34-3.69-3.25-1.72-.91-4.03-1.74-6.95-2.49-2.72-.69-4.79-1.28-6.18-1.77-1.4-.49-2.33-1.01-2.82-1.54-.48-.54-.72-1.19-.72-1.96,0-1.33.63-2.38,1.9-3.14s2.92-1.1,4.96-1.01c2.12.09,3.85.61,5.18,1.58,1.33.97,2.11,2.28,2.35,3.96l6.89-1.26c-.26-2.06-1.03-3.86-2.32-5.39s-2.97-2.72-5.05-3.56c-2.08-.84-4.45-1.26-7.11-1.26s-5.1.43-7.13,1.29c-2.03.86-3.6,2.07-4.71,3.64-1.12,1.57-1.67,3.4-1.67,5.5,0,1.7.37,3.14,1.11,4.33.74,1.19,1.98,2.23,3.73,3.12,1.75.89,4.11,1.72,7.1,2.49,2.72.73,4.75,1.34,6.08,1.83,1.33.49,2.2,1.01,2.62,1.56s.63,1.26.63,2.14c0,1.5-.6,2.68-1.79,3.54-1.19.86-2.84,1.29-4.94,1.29-2.32,0-4.25-.52-5.81-1.56-1.56-1.04-2.55-2.46-2.98-4.26l-6.89,1.06c.6,3.39,2.23,6.02,4.89,7.88,2.66,1.87,6.1,2.8,10.33,2.8s7.85-.98,10.35-2.93c2.5-1.95,3.75-4.64,3.75-8.08,0-1.78-.37-3.3-1.11-4.55h0Z"/><rect x="57.03" y="12.76" width="6.73" height="34.76"/><circle cx="60.39" cy="4.01" r="4.01"/></svg>
+      <span class="app">Puls</span>
+    </a>
+    <div class="lang" role="group" aria-label="Sprog / Language">
+      <button type="button" data-lang="da" aria-pressed="true">DA</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
     </div>
-    <div class="band-actions">
-      <div class="lang" role="group" aria-label="Sprog / Language">
-        <button type="button" id="lang-da" data-lang="da" aria-pressed="true">DA</button>
-        <button type="button" id="lang-en" data-lang="en" aria-pressed="false">EN</button>
+  </header>
+
+  <main>
+    <section>
+      <span class="eyebrow reveal" style="animation-delay:.1s"><span class="dot"></span><span data-t="eyebrow"></span></span>
+      <h1 id="headline"></h1>
+      <p class="lead reveal" style="animation-delay:1.1s" data-t="lead"></p>
+      <div class="cta reveal" style="animation-delay:1.35s">
+        <a class="btn primary" href="https://puls.vicuras.dk/support">
+          <span data-t="open"></span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn ghost" href="https://puls.vicuras.dk/"><span data-t="home"></span></a>
       </div>
-      <span class="me" id="me" hidden><b id="me-name"></b><button type="button" class="signout" id="signout" data-t="signout">Log ud</button></span>
-      <button type="button" class="cta" id="open-new">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-        <span data-t="cta">Meld noget ind</span>
-      </button>
-    </div>
-  </div>
-</header>
-
-<main class="page">
-  <div class="stats" id="stats"></div>
-
-  <div class="toolbar">
-    <div class="tb-left">
-      <div class="tabs" id="tabs" role="group"></div>
-      <label class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-        <input type="search" id="q" autocomplete="off" aria-label="Søg">
-      </label>
-    </div>
-    <div class="tb-right">
-      <select class="compact" id="f-area" aria-label="Hvor"></select>
-      <select class="compact" id="f-status" aria-label="Status"></select>
-      <div class="views" role="group" aria-label="Visning">
-        <button type="button" id="view-grid" data-view="grid" aria-pressed="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>
-          <span data-t="v-grid">Kort</span></button>
-        <button type="button" id="view-board" data-view="board" aria-pressed="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>
-          <span data-t="v-board">Tavle</span></button>
+      <div class="stats reveal" style="animation-delay:1.6s">
+        <div class="stat"><b data-count="81">0</b><span data-t="s1"></span></div>
+        <div class="stat"><b data-count="69">0</b><span data-t="s2"></span></div>
+        <div class="stat"><b data-count="40">0</b><span data-t="s3"></span></div>
       </div>
-    </div>
-  </div>
-  <p class="admin-note" id="admin-note" hidden data-t="admin-note">Du ser alle indmeldinger, også dem der kun er til Louise.</p>
+    </section>
 
-  <div id="list"><div class="grid"><div class="empty"><b data-t="loading">Henter indmeldinger …</b></div></div></div>
-</main>
-
-<div class="scrim" id="scrim" hidden></div>
-<aside class="drawer" id="drawer" hidden aria-modal="true" role="dialog" aria-labelledby="drawer-title">
-  <div class="drawer-head">
-    <h2 id="drawer-title"></h2>
-    <button type="button" class="x" id="close" aria-label="Luk">×</button>
-  </div>
-  <div class="drawer-body" id="detail" hidden></div>
-  <form class="drawer-body" id="form" novalidate hidden>
-    <fieldset class="field">
-      <legend class="label" data-t="q-type">Hvad vil du melde?</legend>
-      <div class="types">
-        <button type="button" class="type" id="type-bug" data-v="bug" aria-pressed="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6.5a4 4 0 0 1 8 0"/><rect x="7" y="7" width="10" height="12" rx="5"/><path d="M12 11v8M3 13h4M17 13h4M4 7l3 2M20 7l-3 2M4 19l3-2M20 19l-3-2"/></svg>
-          <span data-t="bug">Fejl</span>
-        </button>
-        <button type="button" class="type" id="type-feedback" data-v="feedback" aria-pressed="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
-          <span data-t="feedback">Feedback</span>
-        </button>
-        <button type="button" class="type" id="type-idea" data-v="idea" aria-pressed="false">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>
-          <span data-t="idea">Ny idé</span>
-        </button>
+    <section class="scene reveal" style="animation-delay:.4s" aria-hidden="true">
+      <canvas id="flight"></canvas>
+      <div class="node from">
+        <span class="k" data-t="fromK"></span>
+        <span class="t">TeamLead-siden</span>
+        <span class="s">christianvicuras.github.io</span>
       </div>
-    </fieldset>
-
-    <fieldset class="field">
-      <legend class="label" data-t="q-area">Hvor?</legend>
-      <div class="seg">
-        <button type="button" id="area-app" data-v="app" aria-pressed="false"><span data-t="app">Appen</span><small data-t="app-sub">Vicuras-appen på telefonen</small></button>
-        <button type="button" id="area-d365" data-v="d365" aria-pressed="false">D365<small data-t="d365-sub">Dynamics i browseren</small></button>
+      <div class="node to" id="puls">
+        <span class="count-chip" id="landed">0</span>
+        <span class="k" data-t="toK"></span>
+        <span class="t">Puls</span>
+        <span class="s" data-t="toS"></span>
+        <svg class="ecg" viewBox="0 0 120 26" preserveAspectRatio="none"><path class="track" d="M2 15 H30 Q34 10 38 15 H48 L53 18 L59 3 L65 24 L70 15 H80 Q86 9 92 15 H118"/><path class="beat" pathLength="100" d="M2 15 H30 Q34 10 38 15 H48 L53 18 L59 3 L65 24 L70 15 H80 Q86 9 92 15 H118"/></svg>
       </div>
-    </fieldset>
+    </section>
+  </main>
 
-    <div class="field">
-      <label class="label" for="title" data-t="q-title">Overskrift</label>
-      <input type="text" id="title" maxlength="140" autocomplete="off">
-    </div>
+  <section class="steps" aria-labelledby="how">
+    <h2 id="how" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)" data-t="how"></h2>
+    <article class="step"><div class="n">1</div><h3 data-t="h1"></h3><p data-t="p1"></p></article>
+    <article class="step"><div class="n">2</div><h3 data-t="h2"></h3><p data-t="p2"></p></article>
+    <article class="step"><div class="n">3</div><h3 data-t="h3"></h3><p data-t="p3"></p></article>
+  </section>
 
-    <div class="field">
-      <label class="label" for="text" data-t="q-text">Beskrivelse</label>
-      <textarea id="text" maxlength="4000"></textarea>
-    </div>
+  <footer>
+    <span data-t="closed"></span>
+    <span data-t="help"></span>
+  </footer>
+</div>
 
-    <div class="field">
-      <span class="label" data-t="q-shots">Skærmbilleder</span>
-      <div class="drop" id="drop">
-        <p class="hint" id="shot-hint"></p>
-        <div class="drop-row">
-          <button type="button" class="btn" id="pick" data-t="pick">Vælg billede</button>
-          <p id="paste-hint"></p>
-          <input type="file" id="file" accept="image/*" multiple hidden>
-        </div>
-        <div class="thumbs" id="thumbs"></div>
-      </div>
-    </div>
+<script>
+(function () {
+  "use strict";
 
-    <label class="private" for="private">
-      <input type="checkbox" id="private">
-      <div><b data-t="private">Kun synlig for Louise</b><span data-t="private-sub">Andre TeamLeads kan ikke se den. Daniel og Christian kan, så de kan hjælpe.</span></div>
-    </label>
-
-    <div class="field" id="author-field" hidden>
-      <label class="label" for="author" data-t="q-author">Indmeldt af (mail)</label>
-      <input type="text" id="author" inputmode="email" autocomplete="off" placeholder="navn@vicuras.dk">
-      <span class="sub" data-t="author-sub">Kun hvis du melder ind på vegne af en TeamLead.</span>
-    </div>
-
-    <div id="form-msg"></div>
-    <button type="submit" class="submit" id="submit" data-t="send">Send indmelding</button>
-  </form>
-</aside>
-
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, sendPasswordResetEmail, signOut } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
-import { getFirestore, collection, doc, query, where, limit, onSnapshot, getDoc, getDocs, setDoc, updateDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
-import { firebaseConfig, allowedDomain } from './firebase-config.js';
-
-  const T = {
+  var TEXT = {
     da: {
-      kicker: 'Vicuras · TeamLead', h1: 'Fejl, feedback og idéer',
-      lead: 'Fortæl os, hvad der driller, og hvad der kan blive bedre i appen og i D365. Det tager et minut.',
-      cta: 'Meld noget ind', new: 'Ny indmelding', 'q-type': 'Hvad vil du melde?', bug: 'Fejl', feedback: 'Feedback', idea: 'Ny idé',
-      bugs: 'Fejl', feedbacks: 'Feedback', ideas: 'Idéer', total: 'I alt',
-      'solved-of': '{d} af {n} løst', 'all-solved': 'Alle løst', 'none-yet': 'Ingen endnu', 'none-open': 'Ingen åbne', 'total-hint': 'Fejl og feedback. Idéer tæller ikke med.',
-      'q-area': 'Hvor?', app: 'Appen', 'app-sub': 'Vicuras-appen på telefonen', 'd365-sub': 'Dynamics i browseren',
-      'q-title': 'Overskrift', 'q-text': 'Beskrivelse', 'q-shots': 'Skærmbilleder',
-      'ph-title': { bug: 'Fx: Vagtplanen viser ikke mine vagter', feedback: 'Fx: Det er svært at finde mit team', idea: 'Fx: Påmindelse dagen før et event' },
-      'ph-text': { bug: 'Hvad gjorde du, hvad skete der, og hvad havde du forventet?', feedback: 'Hvad fungerer godt eller skidt, og hvorfor?', idea: 'Hvad skal den kunne, og hvem hjælper den?' },
-      pick: 'Vælg billede', paste: 'eller træk et billede herind, eller tryk {k} for at indsætte et skærmbillede',
-      'hint-bug': 'Vedhæft gerne et skærmbillede af fejlen. Så finder vi den meget hurtigere.',
-      'hint-other': 'Skærmbilleder er valgfrie.',
-      private: 'Kun synlig for Louise', 'private-sub': 'Andre TeamLeads kan ikke se den. Daniel og Christian kan, så de kan hjælpe.',
-      'q-author': 'Indmeldt af (mail)', 'author-sub': 'Kun hvis du melder ind på vegne af en TeamLead. Så ser de den under Mine.',
-      'bad-author': 'Skriv en gyldig mailadresse under Indmeldt af, eller lad feltet stå tomt.',
-      send: 'Send indmelding', sending: 'Sender …',
-      'need-type': 'Vælg om det er en fejl, feedback eller en ny idé.', 'need-area': 'Vælg om det gælder appen eller D365.',
-      'need-title': 'Skriv en kort overskrift.',
-      'no-shot': 'Du har ikke vedhæftet et skærmbillede. Et billede gør det meget nemmere for os at finde fejlen.',
-      'add-shot': 'Tilføj skærmbillede', 'send-anyway': 'Send uden',
-      sent: 'Tak! Din indmelding er sendt.', 'sent-private': 'Tak! Din indmelding er sendt til Louise.',
-      'err-save': 'Indmeldingen blev ikke gemt. Prøv igen om lidt. Din tekst er her stadig.',
-      'err-full': 'Der er ikke plads til flere indmeldinger lige nu. Sig det til Daniel.',
-      'err-img': 'Billedet kunne ikke læses. Prøv et PNG- eller JPG-billede.',
-      'err-nodb': 'Siden kan ikke gemme lige nu. Log ind med din Vicuras-konto og prøv igen.',
-      'err-denied': 'Du har ikke adgang til at gemme. Log ind med din Vicuras-konto.',
-      'err-setup': 'Siden er ikke sat op endnu: Firebase-konfigurationen mangler.',
-      'err-load': 'Indmeldingerne kunne ikke hentes. Genindlæs siden, eller log ud og ind igen.',
-      signout: 'Log ud', 'err-signin': 'Login mislykkedes. Prøv igen.', 'err-domain': 'Brug din @{d}-mail.',
-      'a-in': 'Log ind', 'a-in-sub': 'Log ind med din @{d}-mail og den adgangskode, du har fået. Så kan du melde noget ind og følge dine indmeldinger.', 'a-in-go': 'Log ind',
-      'a-reset': 'Glemt adgangskode', 'a-reset-sub': 'Skriv din mail, så sender vi et link, hvor du kan vælge en ny adgangskode.', 'a-reset-go': 'Send link',
-      'a-reset-sent': 'Hvis der er en konto med den mail, har vi sendt et link. Tjek også uønsket post.',
-      'a-email': 'Mail', 'a-pass': 'Adgangskode',
-      'a-to-reset': 'Glemt adgangskode?', 'a-to-in': 'Tilbage til log ind',
-      'a-err-cred': 'Forkert mail eller adgangskode.', 'a-err-email': 'Skriv en gyldig mailadresse.',
-      'err-noaccess': 'Din konto har ikke adgang til indmeldingerne. Kontakt Christian.',
-      'a-err-many': 'For mange forsøg. Vent lidt, og prøv igen.', 'a-err-net': 'Ingen forbindelse. Tjek dit internet, og prøv igen.',
-      mine: 'Mine', others: 'Andre TeamLeads', all: 'Alle', search: 'Søg i indmeldinger',
-      'v-grid': 'Kort', 'v-board': 'Tavle', loading: 'Henter indmeldinger …',
-      'empty-mine': 'Du har ikke meldt noget ind endnu', 'empty-mine-sub': 'Tryk på Meld noget ind. Det du sender, kommer til at stå her.',
-      'empty-others': 'Ingen andre har meldt noget ind endnu', 'empty-others-sub': 'Her ser du det, andre TeamLeads deler med alle.',
-      'empty-all': 'Ingen indmeldinger endnu', 'empty-all-sub': 'Når TeamLeads melder noget ind, kommer det her.',
-      'empty-filter': 'Ingen indmeldinger passer til søgningen', 'empty-filter-sub': 'Prøv et andet ord, eller fjern et filter.',
-      'empty-col': 'Ingen her',
-      'admin-note': 'Du ser alle indmeldinger, også dem der kun er til Louise. Åbn en indmelding for at sætte status og svare.',
-      'only-louise': 'Kun Louise', you: 'dig', someone: 'En TeamLead', by: 'Af', 'reported-by': 'Meldt ind af',
-      status: { new: 'Ny', progress: 'I gang', done: 'Løst', declined: 'Afvist' },
-      'any-area': 'Appen og D365', 'any-status': 'Alle statusser',
-      reply: 'Svar', 'reply-ph': 'Svar til TeamLeaden (valgfrit)', save: 'Gem', saved: 'Gemt', manage: 'Status og svar',
-      delete: 'Slet', 'confirm-delete': 'Slet "{t}"? Det kan ikke fortrydes.', 'err-author': 'Kunne ikke gemme. Indmeldt af skal være en person med adgang til siden.',
-      'shots-loading': 'Henter skærmbilleder …', 'shot-missing': 'Skærmbilledet kunne ikke hentes.',
-      'too-many': 'Højst 5 skærmbilleder pr. indmelding.', remove: 'Fjern billede', close: 'Luk',
-      releases: 'Versioner', fixed: 'Fejl rettet', 'fixed-in': 'i {n} versioner', 'fixed-in-1': 'i 1 version', 'fixed-in-0': 'Ingen versioner endnu',
-      'fixed-hint': 'Fejl med status Løst. Tryk for at se versionerne.',
-      release: 'Version', 'no-release': 'Ingen version', 'new-release': 'Ny version', 'rel-version-ph': 'fx 1.9.9', 'rel-date': 'Dato',
-      'rel-add': 'Opret version', 'rel-bad': 'Skriv et versionsnummer som 1.9.9.', 'rel-exists': 'Den version findes allerede.', 'rel-made': 'Version {v} er oprettet.',
-      'empty-releases': 'Ingen versioner endnu', 'empty-releases-sub': 'Når en indmelding er løst i en version, står den her.',
-      'rel-bugs': '{n} fejl', 'rel-feedbacks': '{n} feedback', 'rel-ideas': '{n} idéer', 'rel-idea-1': '1 idé', 'rel-empty': 'Ingen indmeldinger knyttet til versionen endnu.',
-      unreleased: 'Løst uden version', 'unreleased-sub': 'Løste indmeldinger, der ikke er knyttet til en version. Åbn en for at vælge versionen.',
-      'manage-v': 'Status, version og svar'
+      title: "Flyttet til Puls · Vicuras",
+      eyebrow: "Flyttet 17. november 2026",
+      headline: ["Indmeldingerne", "er", "flyttet", "til", "<Puls>"],
+      lead: "Alle fejl, idéer og feedback fra TeamLead-siden ligger nu i Puls som supportsager, med status, svar og skærmbilleder. Her følger du dine egne og sender nye.",
+      open: "Åbn mine sager i Puls",
+      home: "puls.vicuras.dk",
+      s1: "indmeldinger flyttet",
+      s2: "skærmbilleder med",
+      s3: "allerede løst",
+      fromK: "Før",
+      toK: "Nu",
+      toS: "Support › Mine sager",
+      how: "Sådan finder du dem",
+      h1: "Log ind",
+      p1: "Gå til <em>puls.vicuras.dk</em> og log ind med din Vicuras-konto, som du gør i Outlook.",
+      h2: "Se dine sager",
+      p2: "Under <em>Support › Mine sager</em> står alle dine indmeldinger, med status og svarene fra før.",
+      h3: "Send nye",
+      p3: "Vælg <em>Noget virker ikke</em> eller <em>Jeg har en idé</em>. Du kan vedhæfte skærmbilleder.",
+      closed: "TeamLead-siden er lukket. Intet er gået tabt.",
+      help: "Kan du ikke komme ind? Skriv til it@vicuras.dk."
     },
     en: {
-      kicker: 'Vicuras · TeamLead', h1: 'Bugs, feedback and ideas',
-      lead: 'Tell us what is bugging you and what could be better in the app and in D365. It takes a minute.',
-      cta: 'Report something', new: 'New report', 'q-type': 'What do you want to report?', bug: 'Bug', feedback: 'Feedback', idea: 'New idea',
-      bugs: 'Bugs', feedbacks: 'Feedback', ideas: 'Ideas', total: 'Total',
-      'solved-of': '{d} of {n} solved', 'all-solved': 'All solved', 'none-yet': 'None yet', 'none-open': 'Nothing open', 'total-hint': 'Bugs and feedback. Ideas aren’t counted.',
-      'q-area': 'Where?', app: 'The app', 'app-sub': 'The Vicuras app on your phone', 'd365-sub': 'Dynamics in the browser',
-      'q-title': 'Title', 'q-text': 'Description', 'q-shots': 'Screenshots',
-      'ph-title': { bug: 'E.g. My shifts don’t show in the schedule', feedback: 'E.g. It’s hard to find my team', idea: 'E.g. A reminder the day before an event' },
-      'ph-text': { bug: 'What did you do, what happened, and what did you expect?', feedback: 'What works well or badly, and why?', idea: 'What should it do, and who does it help?' },
-      pick: 'Choose image', paste: 'or drag an image here, or press {k} to paste a screenshot',
-      'hint-bug': 'Please attach a screenshot of the bug. It helps us find it much faster.',
-      'hint-other': 'Screenshots are optional.',
-      private: 'Only visible to Louise', 'private-sub': 'Other TeamLeads can’t see it. Daniel and Christian can, so they can help.',
-      'q-author': 'Reported by (email)', 'author-sub': 'Only when you report on behalf of a TeamLead. They will then see it under Mine.',
-      'bad-author': 'Enter a valid email under Reported by, or leave it empty.',
-      send: 'Send report', sending: 'Sending …',
-      'need-type': 'Choose bug, feedback or new idea.', 'need-area': 'Choose whether it’s about the app or D365.',
-      'need-title': 'Write a short title.',
-      'no-shot': 'You haven’t attached a screenshot. An image makes it much easier for us to find the bug.',
-      'add-shot': 'Add screenshot', 'send-anyway': 'Send without',
-      sent: 'Thanks! Your report has been sent.', 'sent-private': 'Thanks! Your report has been sent to Louise.',
-      'err-save': 'The report wasn’t saved. Try again in a moment. Your text is still here.',
-      'err-full': 'There’s no room for more reports right now. Please tell Daniel.',
-      'err-img': 'The image couldn’t be read. Try a PNG or JPG image.',
-      'err-nodb': 'The page can’t save right now. Sign in with your Vicuras account and try again.',
-      'err-denied': 'You don’t have access to save. Sign in with your Vicuras account.',
-      'err-setup': 'The page isn’t set up yet: the Firebase configuration is missing.',
-      'err-load': 'The reports couldn’t be loaded. Reload the page, or sign out and in again.',
-      signout: 'Sign out', 'err-signin': 'Sign-in failed. Please try again.', 'err-domain': 'Use your @{d} email.',
-      'a-in': 'Sign in', 'a-in-sub': 'Sign in with your @{d} email and the password you were given. Then you can report something and follow your reports.', 'a-in-go': 'Sign in',
-      'a-reset': 'Forgot password', 'a-reset-sub': 'Enter your email and we’ll send a link where you can choose a new password.', 'a-reset-go': 'Send link',
-      'a-reset-sent': 'If there’s an account with that email, we’ve sent a link. Check your spam folder too.',
-      'a-email': 'Email', 'a-pass': 'Password',
-      'a-to-reset': 'Forgot password?', 'a-to-in': 'Back to sign in',
-      'a-err-cred': 'Wrong email or password.', 'a-err-email': 'Enter a valid email address.',
-      'err-noaccess': 'Your account doesn’t have access to the reports. Please contact Christian.',
-      'a-err-many': 'Too many attempts. Wait a moment and try again.', 'a-err-net': 'No connection. Check your internet and try again.',
-      mine: 'Mine', others: 'Other TeamLeads', all: 'All', search: 'Search reports',
-      'v-grid': 'Cards', 'v-board': 'Board', loading: 'Loading reports …',
-      'empty-mine': 'You haven’t reported anything yet', 'empty-mine-sub': 'Press Report something. What you send will show up here.',
-      'empty-others': 'Nobody else has reported anything yet', 'empty-others-sub': 'Here you see what other TeamLeads share with everyone.',
-      'empty-all': 'No reports yet', 'empty-all-sub': 'When TeamLeads report something, it shows up here.',
-      'empty-filter': 'No reports match your search', 'empty-filter-sub': 'Try another word, or clear a filter.',
-      'empty-col': 'Nothing here',
-      'admin-note': 'You see every report, including those only for Louise. Open a report to set its status and reply.',
-      'only-louise': 'Only Louise', you: 'you', someone: 'A TeamLead', by: 'By', 'reported-by': 'Reported by',
-      status: { new: 'New', progress: 'In progress', done: 'Solved', declined: 'Declined' },
-      'any-area': 'App and D365', 'any-status': 'All statuses',
-      reply: 'Reply', 'reply-ph': 'Reply to the TeamLead (optional)', save: 'Save', saved: 'Saved', manage: 'Status and reply',
-      delete: 'Delete', 'confirm-delete': 'Delete "{t}"? This can’t be undone.', 'err-author': 'Couldn’t save. Reported by must be someone with access to the page.',
-      'shots-loading': 'Loading screenshots …', 'shot-missing': 'The screenshot couldn’t be loaded.',
-      'too-many': 'At most 5 screenshots per report.', remove: 'Remove image', close: 'Close',
-      releases: 'Releases', fixed: 'Bugs fixed', 'fixed-in': 'in {n} releases', 'fixed-in-1': 'in 1 release', 'fixed-in-0': 'No releases yet',
-      'fixed-hint': 'Bugs marked Solved. Press to see the releases.',
-      release: 'Release', 'no-release': 'No release', 'new-release': 'New release', 'rel-version-ph': 'e.g. 1.9.9', 'rel-date': 'Date',
-      'rel-add': 'Create release', 'rel-bad': 'Enter a version number like 1.9.9.', 'rel-exists': 'That release already exists.', 'rel-made': 'Release {v} has been created.',
-      'empty-releases': 'No releases yet', 'empty-releases-sub': 'When a report is solved in a release, it shows up here.',
-      'rel-bugs': '{n} bugs', 'rel-bug-1': '1 bug', 'rel-feedbacks': '{n} feedback', 'rel-ideas': '{n} ideas', 'rel-idea-1': '1 idea', 'rel-empty': 'No reports linked to this release yet.',
-      unreleased: 'Solved without a release', 'unreleased-sub': 'Solved reports that aren’t linked to a release. Open one to pick its release.',
-      'manage-v': 'Status, release and reply'
+      title: "Moved to Puls · Vicuras",
+      eyebrow: "Moved on 17 November 2026",
+      headline: ["Your", "reports", "have", "moved", "to", "<Puls>"],
+      lead: "Every bug, idea and piece of feedback from the TeamLead page is now a support ticket in Puls, with its status, replies and screenshots. Follow your own there, and send new ones.",
+      open: "Open my tickets in Puls",
+      home: "puls.vicuras.dk",
+      s1: "reports moved",
+      s2: "screenshots kept",
+      s3: "already solved",
+      fromK: "Before",
+      toK: "Now",
+      toS: "Support › Mine sager",
+      how: "How to find them",
+      h1: "Sign in",
+      p1: "Go to <em>puls.vicuras.dk</em> and sign in with your Vicuras account, the same as for Outlook.",
+      h2: "See your tickets",
+      p2: "<em>Support › Mine sager</em> (my tickets) lists every report you sent, with its status and the replies.",
+      h3: "Send new ones",
+      p3: "Pick <em>Noget virker ikke</em> (something's broken) or <em>Jeg har en idé</em> (I have an idea). Screenshots welcome.",
+      closed: "The TeamLead page has closed. Nothing was lost.",
+      help: "Can't get in? Write to it@vicuras.dk."
     }
   };
-  const ICON = {
-    bug: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6.5a4 4 0 0 1 8 0"/><rect x="7" y="7" width="10" height="12" rx="5"/><path d="M12 11v8M3 13h4M17 13h4"/></svg>',
-    feedback: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg>',
-    idea: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>',
-    all: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h9"/></svg>',
-    img: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 8"/></svg>',
-    check: '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
-    reply: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v4"/></svg>'
-  };
-  const STATUSES = ['new', 'progress', 'done', 'declined'];
-  const VERSION = /^\d+(\.\d+){1,3}$/;
-  // "1.10.0" after "1.9.9": compared part by part as numbers.
-  const byVersionDesc = (a, b) => {
-    const x = a.split('.').map(Number), y = b.split('.').map(Number);
-    for (let i = 0; i < Math.max(x.length, y.length); i++) { const d = (y[i] || 0) - (x[i] || 0); if (d) return d; }
-    return 0;
-  };
-  function releaseList() { return Object.values(S.releases).sort((a, b) => byVersionDesc(a.version, b.version)); }
-  function fmtDay(ymd) { return ymd ? fmtDate(ymd + 'T12:00:00', false) + ' ' + ymd.slice(0, 4) : ''; }
-  const MAX_SHOTS = 5, SHOT_LIMIT = 230000; // characters of data URL per screenshot document (must stay under the limit in firestore.rules)
-  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const $ = id => document.getElementById(id);
-  const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) { } } };
 
-  const S = {
-    lang: store.get('tl-reporter-lang') === 'en' ? 'en' : 'da',
-    view: store.get('tl-reporter-view') === 'board' ? 'board' : 'grid',
-    type: null, area: null, shots: [], confirmNoShot: false, busy: false,
-    db: null, auth: null, uid: null, admin: false, myEmail: null, myName: '',
-    pub: {}, mine: {}, unsub: [],   // report id -> report, from the queries this person may read
-    releases: {},                   // version -> { version, date, notes }
-    tab: null, drawer: null, notice: null,
-    f: { type: '', area: '', status: '', q: '' }
-  };
-  const t = k => T[S.lang][k];
-  const isMac = /Mac|iPhone|iPad/.test(navigator.platform || '');
-  const lc = s => (s || '').toLowerCase();
-  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var stored = null;
+  try { stored = localStorage.getItem("lang"); } catch (e) {}
+  var lang = stored || ((navigator.language || "da").toLowerCase().indexOf("da") === 0 ? "da" : "en");
 
-  /* ---------- authorship ---------- */
-  // Every report carries its author's email (lowercase). That is what "Mine" means, also for reports an editor filed on someone's behalf.
-  function isMine(i) { return !!S.myEmail && lc(i.authorEmail) === S.myEmail; }
-  function authorName(i) {
-    if (isMine(i)) return t('you');
-    return i.authorName || (i.authorEmail && nameFromEmail(i.authorEmail)) || t('someone');
-  }
+  function render(first) {
+    var t = TEXT[lang];
+    document.documentElement.lang = lang;
+    document.title = t.title;
+    document.querySelectorAll("[data-t]").forEach(function (el) { el.innerHTML = t[el.getAttribute("data-t")]; });
+    document.querySelectorAll(".lang button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); });
 
-  /* ---------- language ---------- */
-  function applyLang() {
-    document.documentElement.lang = S.lang;
-    document.querySelectorAll('[data-t]').forEach(e => { const v = t(e.dataset.t); if (typeof v === 'string') e.textContent = v; });
-    $('lang-da').setAttribute('aria-pressed', S.lang === 'da');
-    $('lang-en').setAttribute('aria-pressed', S.lang === 'en');
-    $('q').placeholder = t('search'); $('q').setAttribute('aria-label', t('search'));
-    $('close').setAttribute('aria-label', t('close'));
-    $('paste-hint').textContent = '';
-    const parts = t('paste').split('{k}');
-    const k = el('span', 'kbd', isMac ? '⌘ V' : 'Ctrl + V');
-    $('paste-hint').append(parts[0], k, parts[1]);
-    if (!S.busy) $('submit').textContent = t('send');
-    updateFormHints(); renderFilters(); render();
-    if (S.auth) S.auth.languageCode = S.lang; // Firebase's own mails (confirm, reset) follow the page language
-    if (S.notice) showNotice(S.notice.key);
-    else if (S.authMode) renderAuth(S.authMode, S.authNote);
-    if (S.drawer === 'new') $('drawer-title').textContent = t('new');
-    else if (S.drawer) openDetail(S.drawer);
-  }
-  document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => {
-    S.lang = b.dataset.lang; store.set('tl-reporter-lang', S.lang); applyLang();
-  }));
-
-  /* ---------- drawer ---------- */
-  let lastFocus = null;
-  function showDrawer() {
-    if ($('drawer').hidden) lastFocus = document.activeElement;
-    $('drawer').hidden = false; $('scrim').hidden = false; document.body.classList.add('locked');
-  }
-  function closeDrawer() {
-    S.drawer = null; $('drawer').hidden = true; $('scrim').hidden = true; document.body.classList.remove('locked');
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
-  }
-  function openNew() {
-    if (!S.uid) { const f = $('a-email') || $('list').querySelector('button'); if (f) f.focus(); return; }
-    S.drawer = 'new'; $('drawer-title').textContent = t('new');
-    $('detail').hidden = true; $('form').hidden = false; showDrawer();
-    setTimeout(() => { const b = S.type ? $('title') : $('type-bug'); b && b.focus(); }, 30);
-  }
-  $('open-new').addEventListener('click', openNew);
-  $('close').addEventListener('click', closeDrawer);
-  $('scrim').addEventListener('click', closeDrawer);
-  document.addEventListener('keydown', e => {
-    if (e.key !== 'Escape') return;
-    const v = document.querySelector('.viewer'); if (v) { v.remove(); return; }
-    if (S.drawer) closeDrawer();
-  });
-
-  /* ---------- form ---------- */
-  function updateFormHints() {
-    const ty = S.type || 'bug';
-    $('title').placeholder = t('ph-title')[ty];
-    $('text').placeholder = t('ph-text')[ty];
-    $('shot-hint').textContent = S.type === 'bug' ? t('hint-bug') : t('hint-other');
-    $('drop').classList.toggle('nudge', S.type === 'bug' && S.shots.length === 0);
-  }
-  document.querySelectorAll('.type').forEach(b => b.addEventListener('click', () => {
-    S.type = b.dataset.v; S.confirmNoShot = false;
-    document.querySelectorAll('.type').forEach(x => x.setAttribute('aria-pressed', x === b));
-    updateFormHints(); clearMsg();
-  }));
-  document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
-    S.area = b.dataset.v;
-    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b));
-    clearMsg();
-  }));
-  function msg(kind, text, extra) {
-    const box = $('form-msg'); box.textContent = '';
-    const p = el('div', 'msg ' + kind, text); if (extra) p.append(extra); box.append(p);
-  }
-  function clearMsg() { $('form-msg').textContent = ''; }
-
-  // screenshots: shrink to JPEG so each fits in one stored document
-  function loadImage(file) {
-    return new Promise((res, rej) => {
-      const url = URL.createObjectURL(file); const img = new Image();
-      img.onload = () => { URL.revokeObjectURL(url); res(img); };
-      img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('img')); };
-      img.src = url;
+    // The headline arrives word by word; the last word, Puls, shimmers.
+    var h = document.getElementById("headline");
+    h.innerHTML = "";
+    h.setAttribute("aria-label", t.headline.join(" ").replace(/[<>]/g, ""));
+    t.headline.forEach(function (word, i) {
+      var accent = /^<.*>$/.test(word);
+      var s = document.createElement("span");
+      s.className = accent ? "w accent" : "w";
+      s.setAttribute("aria-hidden", "true");
+      s.textContent = word.replace(/[<>]/g, "");
+      s.style.animationDelay = (first ? 0.25 + i * 0.11 : i * 0.05) + "s" + (accent ? ", 2s" : "");
+      h.appendChild(s);
+      if (i < t.headline.length - 1) h.appendChild(document.createTextNode(" "));
     });
   }
-  async function compress(file) {
-    const img = await loadImage(file);
-    let max = 1600, q = 0.82, out = '';
-    for (let i = 0; i < 8; i++) {
-      const s = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
-      const c = document.createElement('canvas');
-      c.width = Math.max(1, Math.round(img.naturalWidth * s)); c.height = Math.max(1, Math.round(img.naturalHeight * s));
-      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
-      out = c.toDataURL('image/jpeg', q);
-      if (out.length <= SHOT_LIMIT) return { data: out, w: c.width, h: c.height };
-      if (q > 0.55) q -= 0.12; else max = Math.round(max * 0.8);
-    }
-    throw new Error('size');
-  }
-  async function addFiles(files) {
-    const imgs = [...files].filter(f => f && f.type && f.type.startsWith('image/'));
-    if (!imgs.length) return;
-    for (const f of imgs) {
-      if (S.shots.length >= MAX_SHOTS) { msg('warn', t('too-many')); break; }
-      try { S.shots.push(await compress(f)); } catch (e) { msg('err', t('err-img')); }
-    }
-    S.confirmNoShot = false; renderThumbs(); updateFormHints();
-  }
-  function renderThumbs() {
-    const box = $('thumbs'); box.textContent = '';
-    S.shots.forEach((s, i) => {
-      const d = el('div', 'thumb');
-      const im = el('img'); im.src = s.data; im.alt = '';
-      const x = el('button', null, '×'); x.type = 'button'; x.setAttribute('aria-label', t('remove'));
-      x.addEventListener('click', () => { S.shots.splice(i, 1); renderThumbs(); updateFormHints(); });
-      d.append(im, x); box.append(d);
+
+  document.querySelectorAll(".lang button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      lang = b.dataset.lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      render(false);
     });
-  }
-  $('pick').addEventListener('click', () => $('file').click());
-  $('file').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
-  const drop = $('drop');
-  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
-  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
-  drop.addEventListener('drop', e => addFiles(e.dataTransfer.files));
-  // Pasting a screenshot anywhere on the page starts a report with it.
-  document.addEventListener('paste', e => {
-    if (!S.uid) return;
-    const files = [...(e.clipboardData?.items || [])].filter(i => i.kind === 'file').map(i => i.getAsFile());
-    if (!files.length) return;
-    e.preventDefault();
-    if (S.drawer !== 'new') openNew();
-    addFiles(files);
   });
+  render(true);
 
-  // Editors filing on someone's behalf: use that person's name if they have signed in here before.
-  async function nameFor(email) {
-    try {
-      const hits = await getDocs(query(collection(S.db, 'users'), where('email', '==', email)));
-      return (!hits.empty && hits.docs[0].data().name) || nameFromEmail(email);
-    } catch (e) { return nameFromEmail(email); }
-  }
-
-  function saveError(err) {
-    const c = err && err.code;
-    if (c === 'resource-exhausted') return t('err-full');
-    if (c === 'permission-denied' || c === 'unauthenticated') return t('err-denied');
-    return t('err-save');
-  }
-
-  $('form').addEventListener('submit', async e => {
-    e.preventDefault();
-    if (S.busy) return;
-    const title = $('title').value.trim(), text = $('text').value.trim(), priv = $('private').checked;
-    const onBehalf = S.admin ? lc($('author').value.trim()) : '';
-    if (!S.type) return msg('err', t('need-type'));
-    if (!S.area) return msg('err', t('need-area'));
-    if (!title) { $('title').focus(); return msg('err', t('need-title')); }
-    if (onBehalf && !EMAIL.test(onBehalf)) { $('author').focus(); return msg('err', t('bad-author')); }
-    if (!S.db || !S.uid) return msg('err', t('err-nodb'));
-    if (S.type === 'bug' && !S.shots.length && !S.confirmNoShot) {
-      const row = el('div', 'confirm-row');
-      const a = el('button', 'btn', t('add-shot')); a.type = 'button';
-      a.addEventListener('click', () => { clearMsg(); $('file').click(); });
-      const b = el('button', 'btn', t('send-anyway')); b.type = 'button';
-      b.addEventListener('click', () => { S.confirmNoShot = true; $('form').requestSubmit(); });
-      row.append(a, b);
-      return msg('warn', t('no-shot'), row);
+  // Count the figures up once they show.
+  function countUp(el) {
+    var target = +el.dataset.count;
+    if (reduce) { el.textContent = target; return; }
+    var start = null, dur = 1600;
+    function step(ts) {
+      if (start === null) start = ts;
+      var p = Math.min(1, (ts - start) / dur);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
     }
-    S.busy = true; $('submit').disabled = true; $('submit').textContent = t('sending');
-    try {
-      const forOther = onBehalf && onBehalf !== S.myEmail;
-      const ref = doc(collection(S.db, 'reports'));
-      // The report and its screenshots are written together, so nobody sees a report whose images are still missing.
-      const batch = writeBatch(S.db);
-      const shotIds = S.shots.map(s => {
-        const sref = doc(collection(ref, 'shots'));
-        batch.set(sref, { data: s.data, w: s.w, h: s.h });
-        return sref.id;
+    requestAnimationFrame(step);
+  }
+  setTimeout(function () { document.querySelectorAll("[data-count]").forEach(countUp); }, reduce ? 0 : 1700);
+
+  // The steps slide in as they come into view.
+  var steps = document.querySelectorAll(".step");
+  if ("IntersectionObserver" in window && !reduce) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var i = Array.prototype.indexOf.call(steps, e.target);
+        setTimeout(function () { e.target.classList.add("in"); }, 120 * i);
+        io.unobserve(e.target);
       });
-      batch.set(ref, {
-        type: S.type, area: S.area, title, text, shots: shotIds, createdAt: serverTimestamp(), status: 'new', reply: '', private: priv,
-        owner: S.uid,
-        authorEmail: forOther ? onBehalf : S.myEmail,
-        authorName: forOther ? await nameFor(onBehalf) : S.myName
-      });
-      await batch.commit();
-      $('title').value = ''; $('text').value = ''; $('private').checked = false; $('author').value = '';
-      S.shots = []; S.type = null; S.area = null; S.confirmNoShot = false;
-      document.querySelectorAll('.type, .seg button').forEach(x => x.setAttribute('aria-pressed', 'false'));
-      renderThumbs(); updateFormHints();
-      msg('ok', priv ? t('sent-private') : t('sent'));
-      if (!S.admin) S.tab = 'mine';
-      render();
-      setTimeout(() => { if (S.drawer === 'new') { closeDrawer(); clearMsg(); } }, 1600);
-    } catch (err) {
-      console.error(err);
-      msg('err', saveError(err));
-    } finally {
-      S.busy = false; $('submit').disabled = false; $('submit').textContent = t('send');
-    }
-  });
-
-  /* ---------- list ---------- */
-  function allItems() {
-    const out = Object.values({ ...S.pub, ...S.mine }).filter(i => i && i.title);
-    return out.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-  }
-  function inTab(list) {
-    if (S.tab === 'mine') return list.filter(isMine);
-    if (S.tab === 'others') return list.filter(i => !isMine(i) && !i.private);
-    return list; // 'all', and 'releases', which shows everything this person may read
-  }
-  function applyFilters(list, forTiles) {
-    const q = lc(S.f.q.trim());
-    return list.filter(i =>
-      (forTiles || !S.f.type || i.type === S.f.type) &&
-      (!S.f.area || i.area === S.f.area) &&
-      (forTiles || S.view === 'board' || !S.f.status || (i.status || 'new') === S.f.status) &&
-      (!q || lc(i.title).includes(q) || lc(i.text).includes(q) || lc(authorName(i)).includes(q)));
-  }
-  function renderFilters() {
-    const opt = (sel, pairs, cur) => { sel.textContent = ''; pairs.forEach(([v, l]) => { const o = el('option', null, l); o.value = v; if (v === cur) o.selected = true; sel.append(o); }); };
-    opt($('f-area'), [['', t('any-area')], ['app', t('app')], ['d365', 'D365']], S.f.area);
-    opt($('f-status'), [['', t('any-status')], ...STATUSES.map(s => [s, t('status')[s]])], S.f.status);
-    $('f-status').hidden = S.view === 'board';
-  }
-  $('f-area').addEventListener('change', e => { S.f.area = e.target.value; render(); });
-  $('f-status').addEventListener('change', e => { S.f.status = e.target.value; render(); });
-  $('q').addEventListener('input', e => { S.f.q = e.target.value; render(); });
-  document.querySelectorAll('.views button').forEach(b => b.addEventListener('click', () => {
-    S.view = b.dataset.view; store.set('tl-reporter-view', S.view);
-    document.querySelectorAll('.views button').forEach(x => x.setAttribute('aria-pressed', x === b));
-    renderFilters(); render();
-  }));
-
-  function fmtDate(iso, long) {
-    try {
-      const o = long ? { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' } : { day: 'numeric', month: 'short' };
-      return new Intl.DateTimeFormat(S.lang === 'da' ? 'da-DK' : 'en-GB', o).format(new Date(iso));
-    } catch (e) { return ''; }
+    }, { threshold: .2 });
+    steps.forEach(function (s) { io.observe(s); });
+  } else {
+    steps.forEach(function (s) { s.classList.add("in"); });
   }
 
-  // Summary tiles: how many there are of each kind, and how many are solved. Declined reports don't count towards "X af Y løst",
-  // and on the total tile neither do ideas: they get built, not solved.
-  function renderStats(base) {
-    const box = $('stats'); box.textContent = '';
-    const defs = [['', 'all', t('total')], ['bug', 'bug', t('bugs')], ['feedback', 'feedback', t('feedbacks')], ['idea', 'idea', t('ideas')]];
-    const pool = applyFilters(base, true);
-    defs.forEach(([v, icon, label]) => {
-      const items = v ? pool.filter(i => i.type === v) : pool;
-      const n = items.length;
-      const solvable = v ? items : items.filter(i => i.type !== 'idea');
-      const done = solvable.filter(i => i.status === 'done').length;
-      const toSolve = solvable.filter(i => i.status !== 'declined').length;
-      const closed = toSolve > 0 && done === toSolve;
-      const b = el('button', 'stat' + (closed ? ' complete' : '')); b.type = 'button'; b.id = 'stat-' + (v || 'all');
-      b.setAttribute('aria-pressed', S.f.type === v);
-      const top = el('span', 'stat-top');
-      const d = el('span', 'dot ' + (v || 'feedback')); d.innerHTML = ICON[icon];
-      if (!v) d.style.background = 'var(--soft)', d.querySelector('svg').style.stroke = 'var(--accent)';
-      const txt = el('span'); txt.append(el('div', 'n', String(n)), el('div', 'l', label));
-      top.append(d, txt);
-      const prog = el('span', 'prog');
-      const bar = el('span', 'bar'); bar.setAttribute('aria-hidden', 'true');
-      const fd = el('i', 'd'); fd.style.width = (toSolve ? (done / toSolve) * 100 : 0) + '%';
-      bar.append(fd);
-      const line = el('span', 'prog-l' + (done ? ' some' : ''));
-      if (closed) line.innerHTML = ICON.check;
-      if (!v) line.title = t('total-hint');
-      line.append(!n ? t('none-yet') : !toSolve ? t('none-open') : closed ? t('all-solved') : t('solved-of').replace('{d}', done).replace('{n}', toSolve));
-      prog.append(bar, line);
-      b.append(top, prog);
-      b.addEventListener('click', () => { S.f.type = S.f.type === v ? '' : v; render(); });
-      box.append(b);
-    });
-    // Bugs fixed, in all: the bugs marked Solved, and how many releases they went out in.
-    const fixed = pool.filter(i => i.type === 'bug' && i.status === 'done');
-    const rels = new Set(fixed.map(i => i.release).filter(Boolean)).size;
-    const f = el('button', 'stat fixed'); f.type = 'button'; f.id = 'stat-fixed'; f.title = t('fixed-hint');
-    f.setAttribute('aria-pressed', S.tab === 'releases');
-    const ft = el('span', 'stat-top');
-    const fd = el('span', 'dot bug'); fd.innerHTML = ICON.check; fd.style.background = 'var(--idea-soft)'; fd.querySelector('svg').style.stroke = 'var(--ok)';
-    const fx = el('span'); fx.append(el('div', 'n', String(fixed.length)), el('div', 'l', t('fixed')));
-    ft.append(fd, fx);
-    const fp = el('span', 'prog');
-    fp.append(el('span', 'prog-l' + (rels ? ' some' : ''), rels === 0 ? t('fixed-in-0') : rels === 1 ? t('fixed-in-1') : t('fixed-in').replace('{n}', rels)));
-    f.append(ft, fp);
-    f.addEventListener('click', () => { S.tab = S.tab === 'releases' ? (S.admin ? 'all' : 'mine') : 'releases'; render(); });
-    box.append(f);
-  }
+  // The scene: tickets (bug, idea, feedback) fly from the old page into Puls along a curve, one after another,
+  // until all 81 have landed; then a few keep drifting across slowly.
+  var canvas = document.getElementById("flight");
+  var ctx = canvas.getContext("2d");
+  var puls = document.getElementById("puls");
+  var landedEl = document.getElementById("landed");
+  var scene = canvas.parentElement;
+  var KINDS = [
+    { label: "Bug", color: "#F0A3A3", ink: "#5b1d1d" },
+    { label: "Idé", color: "#BFE3C9", ink: "#0E5642" },
+    { label: "Feedback", color: "#DAB5CF", ink: "#772E4B" }
+  ];
+  var W = 0, H = 0, dpr = 1, flyers = [], landed = 0, total = 81, last = 0, nextAt = 0;
 
-  // The Releases tab: each release, newest first, with what was solved in it. Editors also see the solved reports with no release yet.
-  function renderReleases(list, box) {
-    const wrap = el('div', 'rels');
-    const counts = items => {
-      const c = el('span', 'rel-counts');
-      const n = k => items.filter(i => i.type === k).length;
-      const b = n('bug'), fb = n('feedback'), id = n('idea');
-      if (b) c.append(el('span', 'chip', b === 1 && t('rel-bug-1') ? t('rel-bug-1') : t('rel-bugs').replace('{n}', b)));
-      if (fb) c.append(el('span', 'chip', t('rel-feedbacks').replace('{n}', fb)));
-      if (id) c.append(el('span', 'chip', id === 1 ? t('rel-idea-1') : t('rel-ideas').replace('{n}', id)));
-      return c;
+  function size() {
+    var r = scene.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener("resize", size);
+  size();
+
+  function anchors() {
+    var s = scene.getBoundingClientRect();
+    var f = scene.querySelector(".from").getBoundingClientRect();
+    var t = puls.getBoundingClientRect();
+    return {
+      a: { x: f.left - s.left + f.width / 2, y: f.top - s.top + f.height / 2 },
+      b: { x: t.left - s.left + t.width / 2, y: t.top - s.top + t.height / 2 }
     };
-    const order = it => ({ bug: 0, feedback: 1, idea: 2 }[it.type] ?? 3);
-    releaseList().forEach(r => {
-      const items = list.filter(i => i.release === r.version).sort((a, b) => order(a) - order(b) || (b.createdAt || '').localeCompare(a.createdAt || ''));
-      const sec = el('section', 'rel'); sec.id = 'rel-' + r.version;
-      const head = el('div', 'rel-head');
-      head.append(el('span', 'rel-v', r.version), el('span', 'rel-date', fmtDay(r.date)), counts(items));
-      sec.append(head);
-      if (r.notes) sec.append(el('p', 'rel-notes', r.notes));
-      if (items.length) { const g = el('div', 'grid'); items.forEach(i => g.append(card(i, false))); sec.append(g); }
-      else sec.append(el('p', 'rel-notes', t('rel-empty')));
-      wrap.append(sec);
-    });
-    if (S.admin) {
-      const loose = list.filter(i => i.status === 'done' && !i.release);
-      if (loose.length) {
-        const sec = el('section', 'rel unrel');
-        const head = el('div', 'rel-head'); head.append(el('span', 'rel-v', t('unreleased')), counts(loose));
-        sec.append(head, el('p', 'rel-notes', t('unreleased-sub')));
-        const g = el('div', 'grid'); loose.forEach(i => g.append(card(i, false))); sec.append(g);
-        wrap.append(sec);
-      }
+  }
+
+  function spawn(now) {
+    var k = KINDS[Math.floor(Math.random() * KINDS.length)];
+    flyers.push({ k: k, t0: now, dur: 1500 + Math.random() * 700, bend: (Math.random() - .5) * .5, spin: (Math.random() - .5) * .6, counted: landed < total });
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+
+  function drawChip(f, x, y, alpha, scale, rot) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(x, y); ctx.rotate(rot); ctx.scale(scale, scale);
+    ctx.font = "800 11px Manrope, system-ui, sans-serif";
+    var w = ctx.measureText(f.k.label).width + 30, h = 24;
+    ctx.shadowColor = "rgba(0,0,0,.25)"; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
+    ctx.fillStyle = f.k.color; roundRect(-w / 2, -h / 2, w, h, 12); ctx.fill();
+    ctx.shadowColor = "transparent";
+    ctx.fillStyle = f.k.ink;
+    ctx.beginPath(); ctx.arc(-w / 2 + 12, 0, 3.5, 0, Math.PI * 2); ctx.fill();
+    ctx.textBaseline = "middle"; ctx.fillText(f.k.label, -w / 2 + 20, 0.5);
+    ctx.restore();
+  }
+
+  function frame(now) {
+    if (!last) { last = now; nextAt = now + 900; }
+    last = now;
+    ctx.clearRect(0, 0, W, H);
+    var p = anchors();
+
+    // The path, faintly dotted: from behind the old card, bowing through the empty corner, in behind Puls.
+    var cx = (p.a.x + p.b.x) / 2 - (p.b.y - p.a.y) * .45, cy = (p.a.y + p.b.y) / 2 + (p.b.x - p.a.x) * .45;
+    ctx.save();
+    ctx.setLineDash([2, 9]); ctx.lineDashOffset = -now / 40; ctx.lineCap = "round";
+    ctx.strokeStyle = "rgba(252,250,241,.22)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(p.a.x, p.a.y); ctx.quadraticCurveTo(cx, cy, p.b.x, p.b.y); ctx.stroke();
+    ctx.restore();
+
+    // Fast while the 81 move, then calm.
+    if (now >= nextAt) {
+      spawn(now);
+      nextAt = now + (landed < total ? 160 + Math.random() * 120 : 1400 + Math.random() * 900);
     }
-    if (!wrap.children.length) {
-      const g = el('div', 'grid'); const e = el('div', 'empty');
-      e.append(el('b', null, t('empty-releases')), el('span', null, t('empty-releases-sub')));
-      g.append(e); box.append(g); return;
-    }
-    box.append(wrap);
-  }
 
-  function render() {
-    if (!S.tab) return;
-    const all = allItems();
-    // tabs
-    const tabs = $('tabs'); tabs.textContent = '';
-    (S.admin ? ['all', 'mine', 'releases'] : ['mine', 'others', 'releases']).forEach(k => {
-      const prev = S.tab; S.tab = k; const n = k === 'releases' ? releaseList().length : inTab(all).length; S.tab = prev;
-      const b = el('button', 'tab'); b.type = 'button'; b.id = 'tab-' + k; b.setAttribute('aria-pressed', S.tab === k);
-      b.append(t(k), el('span', 'n', String(n)));
-      b.addEventListener('click', () => { S.tab = k; render(); });
-      tabs.append(b);
-    });
-    $('admin-note').hidden = !S.admin;
-    const base = inTab(all);
-    renderStats(base);
-    const releasesTab = S.tab === 'releases';
-    $('f-status').hidden = S.view === 'board' || releasesTab;
-    document.querySelector('.views').hidden = releasesTab;
-    const list = applyFilters(base);
-    const box = $('list'); box.textContent = '';
-    if (releasesTab) { renderReleases(applyFilters(base, true), box); return; }
-
-    if (!list.length) {
-      const g = el('div', 'grid'); const e = el('div', 'empty');
-      const filtered = base.length > 0;
-      e.append(el('b', null, filtered ? t('empty-filter') : t('empty-' + S.tab)), el('span', null, filtered ? t('empty-filter-sub') : t('empty-' + S.tab + '-sub')));
-      if (!filtered && S.tab === 'mine') { const b = el('button', 'btn solid', t('cta')); b.type = 'button'; b.addEventListener('click', openNew); e.append(b); }
-      g.append(e); box.append(g);
-    } else if (S.view === 'board') {
-      const wrap = el('div', 'board-wrap'); const board = el('div', 'board');
-      STATUSES.forEach(st => {
-        const col = el('section', 'col'); const items = list.filter(i => (i.status || 'new') === st);
-        const h = el('h3'); h.append(el('span', null, t('status')[st]), el('span', null, String(items.length)));
-        col.append(h);
-        if (!items.length) col.append(el('span', 'sub', t('empty-col')));
-        items.forEach(i => col.append(card(i, true)));
-        board.append(col);
-      });
-      wrap.append(board); box.append(wrap);
-    } else {
-      const g = el('div', 'grid');
-      list.forEach(i => g.append(card(i, false)));
-      box.append(g);
-    }
-  }
-
-  function card(it, compact) {
-    const c = el('button', 'card'); c.type = 'button';
-    const top = el('div', 'card-top');
-    const dot = el('span', 'dot ' + it.type); dot.innerHTML = ICON[it.type] || ICON.feedback;
-    top.append(dot, el('span', 'title', it.title));
-    if (!compact) { const st = it.status || 'new'; top.append(el('span', 'status ' + st, t('status')[st] || st)); }
-    c.append(top);
-    if (it.text) c.append(el('p', 'excerpt', it.text));
-    const foot = el('div', 'card-foot');
-    foot.append(el('span', 'chip', it.area === 'app' ? t('app') : 'D365'));
-    if (it.release) foot.append(el('span', 'chip ver', 'v' + it.release));
-    if (it.private) foot.append(el('span', 'chip lock', '🔒 ' + t('only-louise')));
-    if (it.shots && it.shots.length) { const s = el('span', 'ico'); s.innerHTML = ICON.img; s.append(String(it.shots.length)); foot.append(s); }
-    if (it.reply) { const r = el('span', 'ico'); r.innerHTML = ICON.reply; foot.append(r); }
-    foot.append(el('span', 'sep'));
-    foot.append(el('span', 'who', authorName(it)), el('span', null, '· ' + fmtDate(it.createdAt)));
-    c.append(foot);
-    c.addEventListener('click', () => openDetail(it.id));
-    return c;
-  }
-
-  /* ---------- detail ---------- */
-  function openDetail(id) {
-    const it = allItems().find(i => i.id === id);
-    if (!it) { if (S.drawer === id) closeDrawer(); return; }
-    S.drawer = id;
-    $('drawer-title').textContent = t(it.type) || '';
-    $('form').hidden = true;
-    const box = $('detail'); box.hidden = false; box.textContent = '';
-    const head = el('div', 'd-head');
-    const dot = el('span', 'dot ' + it.type); dot.innerHTML = ICON[it.type] || ICON.feedback;
-    const hb = el('div'); hb.append(el('h3', 'd-title', it.title));
-    const meta = el('div', 'd-meta');
-    const st = it.status || 'new';
-    meta.append(el('span', 'status ' + st, t('status')[st]), el('span', 'chip', it.area === 'app' ? t('app') : 'D365'));
-    if (it.release) meta.append(el('span', 'chip ver', t('release') + ' ' + it.release));
-    if (it.private) meta.append(el('span', 'chip lock', '🔒 ' + t('only-louise')));
-    meta.append(el('span', 'who', t('reported-by') + ' ' + authorName(it)), el('span', null, fmtDate(it.createdAt, true)));
-    hb.append(meta); head.append(dot, hb); box.append(head);
-    if (it.text) box.append(el('p', 'd-text', it.text));
-    if (it.shots && it.shots.length) {
-      const f = el('div', 'field'); f.append(el('span', 'label', t('q-shots')));
-      const shots = el('div', 'shots'); shots.append(el('span', 'sub', t('shots-loading')));
-      f.append(shots); box.append(f); loadShots(it, shots);
-    }
-    if (it.reply) { const r = el('div', 'reply'); r.append(el('b', null, t('reply')), el('p', null, it.reply)); box.append(r); }
-    if (S.admin) box.append(renderAdmin(it));
-    showDrawer();
-  }
-
-  const shotCache = {};
-  async function loadShots(it, box) {
-    const out = [];
-    for (const sid of it.shots) {
-      const k = it.id + '/' + sid;
-      if (!shotCache[k]) {
-        try { const s = await getDoc(doc(S.db, 'reports', it.id, 'shots', sid)); if (s.exists()) shotCache[k] = s.data().data; } catch (e) { }
-      }
-      out.push(shotCache[k] || null);
-    }
-    if (!box.isConnected) return;
-    box.textContent = '';
-    out.forEach(src => {
-      if (!src || !src.startsWith('data:image/')) { box.append(el('span', 'sub', t('shot-missing'))); return; }
-      const a = el('a'); a.href = '#'; const im = el('img'); im.src = src; im.alt = ''; a.append(im);
-      a.addEventListener('click', e => { e.preventDefault(); const v = el('div', 'viewer'); const big = el('img'); big.src = src; big.alt = ''; v.append(big); v.addEventListener('click', () => v.remove()); document.body.append(v); });
-      box.append(a);
-    });
-  }
-
-  function renderAdmin(it) {
-    const box = el('div', 'adm');
-    box.append(el('h3', null, t('manage-v')));
-    let status = it.status || 'new';
-    const pick = el('div', 'status-pick'); pick.setAttribute('role', 'group');
-    STATUSES.forEach(s => {
-      const b = el('button', null, t('status')[s]); b.type = 'button'; b.setAttribute('aria-pressed', s === status);
-      b.addEventListener('click', () => { status = s; pick.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
-      pick.append(b);
-    });
-    const rl = el('label', 'label', t('reply')); rl.htmlFor = 'rp-' + it.id;
-    const ta = el('textarea'); ta.id = 'rp-' + it.id; ta.placeholder = t('reply-ph'); ta.value = it.reply || ''; ta.maxLength = 2000;
-    // Who the report belongs to: editors can move it to the person it came from (it then shows under their Mine).
-    const al = el('label', 'label', t('q-author')); al.htmlFor = 'au-' + it.id;
-    const au = el('input'); au.type = 'text'; au.id = 'au-' + it.id; au.inputMode = 'email'; au.autocomplete = 'off';
-    au.value = it.authorEmail || ''; au.placeholder = 'navn@' + allowedDomain;
-    // The release it was solved in, from the releases editors have made, or a new one made here.
-    const vl = el('label', 'label', t('release')); vl.htmlFor = 'rl-' + it.id;
-    const vs = el('select'); vs.id = 'rl-' + it.id;
-    const fillReleases = cur => {
-      vs.textContent = '';
-      [['', t('no-release')], ...releaseList().map(r => [r.version, r.version + (r.date ? ' · ' + fmtDay(r.date) : '')])].forEach(([v, l]) => {
-        const o = el('option', null, l); o.value = v; if (v === cur) o.selected = true; vs.append(o);
-      });
-    };
-    fillReleases(it.release || '');
-    const add = el('div', 'rel-add');
-    const nv = el('input'); nv.type = 'text'; nv.inputMode = 'decimal'; nv.placeholder = t('rel-version-ph'); nv.setAttribute('aria-label', t('new-release'));
-    const nd = el('input'); nd.type = 'date'; nd.value = new Date().toISOString().slice(0, 10); nd.setAttribute('aria-label', t('rel-date'));
-    const nb = el('button', 'btn', t('rel-add')); nb.type = 'button';
-    nb.addEventListener('click', async () => {
-      const v = nv.value.trim();
-      if (!VERSION.test(v)) { nv.focus(); note.textContent = t('rel-bad'); return; }
-      if (S.releases[v]) { vs.value = v; note.textContent = t('rel-exists'); return; }
-      nb.disabled = true; note.textContent = '';
-      try {
-        await setDoc(doc(S.db, 'releases', v), { version: v, date: nd.value || '', notes: '', createdAt: serverTimestamp() });
-        S.releases[v] = { version: v, date: nd.value || '', notes: '' };
-        fillReleases(v); nv.value = ''; note.textContent = t('rel-made').replace('{v}', v);
-      } catch (e) { note.textContent = saveError(e); }
-      nb.disabled = false;
-    });
-    add.append(nv, nd, nb);
-    const row = el('div', 'adm-row');
-    const save = el('button', 'btn solid', t('save')); save.type = 'button';
-    const del = el('button', 'btn danger', t('delete')); del.type = 'button';
-    const note = el('span', 'sub', '');
-    save.addEventListener('click', async () => {
-      const email = lc(au.value.trim());
-      if (!EMAIL.test(email)) { au.focus(); note.textContent = t('bad-author'); return; }
-      save.disabled = true; note.textContent = '';
-      try {
-        const change = { status, reply: ta.value.trim(), repliedAt: serverTimestamp(), release: vs.value };
-        if (email !== lc(it.authorEmail)) Object.assign(change, { authorEmail: email, authorName: await nameFor(email) });
-        await updateDoc(doc(S.db, 'reports', it.id), change);
-        note.textContent = t('saved');
-      } catch (e) { note.textContent = e && e.code === 'permission-denied' ? t('err-author') : saveError(e); }
-      save.disabled = false;
-    });
-    del.addEventListener('click', async () => {
-      if (!confirm(t('confirm-delete').replace('{t}', it.title))) return;
-      del.disabled = true; note.textContent = '';
-      try {
-        const batch = writeBatch(S.db);
-        (it.shots || []).forEach(sid => batch.delete(doc(S.db, 'reports', it.id, 'shots', sid)));
-        batch.delete(doc(S.db, 'reports', it.id));
-        await batch.commit();
-        closeDrawer();
-      } catch (e) { note.textContent = saveError(e); del.disabled = false; }
-    });
-    row.append(save, note, el('span', 'sep'), del);
-    box.append(pick, vl, vs, add, rl, ta, al, au, row);
-    return box;
-  }
-
-  /* ---------- sign-in ---------- */
-  // Email + password; anyone with a @vicuras.dk address can create an account (no email confirmation).
-  function showNotice(key) {
-    S.notice = { key }; S.authMode = null;
-    $('stats').textContent = ''; $('tabs').textContent = ''; $('admin-note').hidden = true;
-    const box = $('list'); box.textContent = '';
-    const g = el('div', 'grid'); const e = el('div', 'empty'); e.append(el('b', null, t(key))); g.append(e); box.append(g);
-  }
-  function input(id, label, type, ac, value) {
-    const f = el('div', 'field'); const l = el('label', 'label', label); l.htmlFor = id;
-    const i = el('input'); i.type = type; i.id = id; i.autocomplete = ac; i.value = value || '';
-    if (type === 'email') { i.inputMode = 'email'; i.placeholder = 'navn@' + allowedDomain; }
-    f.append(l, i); return f;
-  }
-  function linkBtn(text, fn) { const b = el('button', 'linkish', text); b.type = 'button'; b.addEventListener('click', fn); return b; }
-  function authError(e) {
-    const c = (e && e.code) || '';
-    if (c === 'auth/invalid-credential' || c === 'auth/wrong-password' || c === 'auth/user-not-found' || c === 'auth/invalid-login-credentials') return t('a-err-cred');
-    if (c === 'auth/invalid-email') return t('a-err-email');
-    if (c === 'auth/too-many-requests') return t('a-err-many');
-    if (c === 'auth/network-request-failed') return t('a-err-net');
-    return t('err-signin');
-  }
-  function renderAuth(mode, note) {
-    // Keep what was typed when switching mode or language.
-    const keep = id => ($(id) ? $(id).value : '');
-    const vals = { email: keep('a-email') || (S.auth && S.auth.currentUser && S.auth.currentUser.email) || '' };
-    S.authMode = mode; S.authNote = note || null; S.notice = null;
-    $('stats').textContent = ''; $('tabs').textContent = ''; $('admin-note').hidden = true;
-    const box = $('list'); box.textContent = '';
-    const card = el('form', 'auth'); card.noValidate = true;
-    const say = n => el('div', 'msg ' + n.kind, n.raw || t(n.key).replace('{e}', vals.email).replace('{d}', allowedDomain));
-    const title = mode === 'reset' ? 'a-reset' : 'a-in';
-    card.append(el('h2', null, t(title)), el('p', 'sub', t(title + '-sub').replace('{d}', allowedDomain)));
-    card.append(input('a-email', t('a-email'), 'email', 'email', vals.email));
-    if (mode !== 'reset') card.append(input('a-pass', t('a-pass'), 'password', 'current-password'));
-    const msgBox = el('div'); card.append(msgBox);
-    if (note) msgBox.append(say(note));
-    const go = el('button', 'submit', t(title + '-go')); go.type = 'submit'; card.append(go);
-    const row = el('div', 'auth-links');
-    if (mode === 'in') row.append(linkBtn(t('a-to-reset'), () => renderAuth('reset')));
-    else row.append(linkBtn(t('a-to-in'), () => renderAuth('in')));
-    card.append(row);
-    card.addEventListener('submit', async e => {
-      e.preventDefault();
-      const email = lc($('a-email').value.trim()), pass = $('a-pass') ? $('a-pass').value : '';
-      const fail = text => { msgBox.textContent = ''; msgBox.append(el('div', 'msg err', text)); };
-      if (!EMAIL.test(email)) { $('a-email').focus(); return fail(t('a-err-email')); }
-      if (allowedDomain && !email.endsWith('@' + lc(allowedDomain))) { $('a-email').focus(); return fail(t('err-domain').replace('{d}', allowedDomain)); }
-      if (mode === 'in' && !pass) { $('a-pass').focus(); return fail(t('a-err-cred')); }
-      go.disabled = true;
-      try {
-        if (mode === 'in') await signInWithEmailAndPassword(S.auth, email, pass);
-        else {
-          await sendPasswordResetEmail(S.auth, email);
-          renderAuth('in', { kind: 'ok', key: 'a-reset-sent' });
+    flyers = flyers.filter(function (f) {
+      var t = (now - f.t0) / f.dur;
+      if (t >= 1) {
+        if (f.counted && landed < total) {
+          landed++;
+          landedEl.textContent = landed;
+          puls.classList.add("bump");
+          clearTimeout(puls._b); puls._b = setTimeout(function () { puls.classList.remove("bump"); }, 160);
         }
-      } catch (err) { console.error(err); fail(authError(err)); }
-      go.disabled = false;
+        return false;
+      }
+      var e = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      var bx = cx - (p.b.y - p.a.y) * f.bend, by = cy + (p.b.x - p.a.x) * f.bend;
+      var x = (1 - e) * (1 - e) * p.a.x + 2 * (1 - e) * e * bx + e * e * p.b.x;
+      var y = (1 - e) * (1 - e) * p.a.y + 2 * (1 - e) * e * by + e * e * p.b.y;
+      var alpha = Math.min(1, t * 4) * Math.min(1, (1 - t) * 4);
+      drawChip(f, x, y, alpha, .85 + Math.sin(Math.PI * t) * .25, f.spin * Math.sin(Math.PI * t));
+      return true;
     });
-    box.append(card);
-  }
-  $('signout').addEventListener('click', () => signOut(S.auth));
 
-  /* ---------- data ---------- */
-  function intoMap(map, snap) {
-    for (const k of Object.keys(map)) delete map[k];
-    snap.docs.forEach(d => {
-      const v = d.data({ serverTimestamps: 'estimate' });
-      const iso = x => (x && x.toDate ? x.toDate().toISOString() : '');
-      map[d.id] = { ...v, id: d.id, createdAt: iso(v.createdAt), repliedAt: iso(v.repliedAt) };
-    });
-  }
-  function onData() {
-    render();
-    // Refresh an open report, unless an editor is working in it (that would wipe the reply being typed).
-    if (S.drawer && S.drawer !== 'new' && !$('detail').contains(document.activeElement)) openDetail(S.drawer);
-  }
-  // "anna.hansen@vicuras.dk" -> "Anna Hansen", since accounts are created without a name.
-  function nameFromEmail(email) {
-    return email.split('@')[0].split(/[._-]+/).filter(Boolean).map(s => s[0].toUpperCase() + s.slice(1)).join(' ');
-  }
-  function stopListening() {
-    S.unsub.forEach(u => u()); S.unsub = [];
-    for (const m of [S.pub, S.mine, S.releases]) for (const k of Object.keys(m)) delete m[k];
+    requestAnimationFrame(frame);
   }
 
-  async function onUser(u) {
-    stopListening();
-    if (S.drawer) closeDrawer();
-    S.uid = null; S.myEmail = null; S.myName = ''; S.admin = false; S.tab = null;
-    $('me').hidden = true; $('author-field').hidden = true;
-    if (!u) { renderAuth(S.authMode === 'reset' ? 'reset' : 'in'); return; }
-    const email = lc(u.email || '');
-    if (!email || (allowedDomain && !email.endsWith('@' + lc(allowedDomain)))) {
-      await signOut(S.auth); renderAuth('in', { kind: 'err', key: 'err-domain' }); return;
-    }
-    S.uid = u.uid; S.myEmail = email; S.myName = u.displayName || nameFromEmail(email);
-    $('me-name').textContent = S.myName || email; $('me').hidden = false;
-    S.notice = null; S.authMode = null;
-    $('list').textContent = '';
-    const g = el('div', 'grid'); const e = el('div', 'empty'); e.append(el('b', null, t('loading'))); g.append(e); $('list').append(g);
-    // Keep a small profile so editors can show a name on reports they file for someone.
-    setDoc(doc(S.db, 'users', u.uid), { email, name: S.myName, lastSeen: serverTimestamp() }).catch(() => { });
-    // Who is an editor is decided by firestore.rules; only editors may ask for the reports that are only for Louise.
-    const reports = collection(S.db, 'reports');
-    try { await getDocs(query(reports, where('private', '==', true), limit(1))); S.admin = true; } catch (e) { S.admin = false; }
-    if (S.uid !== u.uid) return; // signed out meanwhile
-    S.tab = S.admin ? 'all' : 'mine';
-    $('author-field').hidden = !S.admin;
-    const fail = err => { console.error(err); showNotice(err && err.code === 'permission-denied' ? 'err-noaccess' : 'err-load'); };
-    // The releases are read on their own: without them the reports still show, just without the Releases tab's headings.
-    S.unsub.push(onSnapshot(collection(S.db, 'releases'), s => {
-      for (const k of Object.keys(S.releases)) delete S.releases[k];
-      s.docs.forEach(d => { const v = d.data(); S.releases[d.id] = { version: d.id, date: v.date || '', notes: v.notes || '' }; });
-      onData();
-    }, err => console.error(err)));
-    if (S.admin) {
-      S.unsub.push(onSnapshot(reports, s => { intoMap(S.pub, s); onData(); }, fail));
-    } else {
-      // Everyone reads the shared reports plus their own (their own include the ones only for Louise).
-      S.unsub.push(onSnapshot(query(reports, where('private', '==', false)), s => { intoMap(S.pub, s); onData(); }, fail));
-      S.unsub.push(onSnapshot(query(reports, where('authorEmail', '==', email)), s => { intoMap(S.mine, s); onData(); }, fail));
-    }
-    render();
+  if (reduce) {
+    landedEl.textContent = total;
+  } else {
+    setTimeout(function () { requestAnimationFrame(frame); }, 700);
   }
-
-  function start() {
-    document.querySelectorAll('.views button').forEach(x => x.setAttribute('aria-pressed', x.dataset.view === S.view));
-    applyLang();
-    if (!firebaseConfig || !firebaseConfig.apiKey || /^YOUR/.test(firebaseConfig.apiKey)) { $('open-new').hidden = true; showNotice('err-setup'); return; }
-    const app = initializeApp(firebaseConfig);
-    S.auth = getAuth(app); S.auth.languageCode = S.lang;
-    S.db = getFirestore(app);
-    onAuthStateChanged(S.auth, onUser);
-  }
-  start();
+})();
 </script>
-
-</body></html>
+</body>
+</html>
